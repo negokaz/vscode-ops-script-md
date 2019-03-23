@@ -1,0 +1,41 @@
+code {
+    font-family: var(--vscode-editor-font-family);
+}
+
+.command-box {
+    position:relative;
+}
+
+.command-box > pre {
+    padding-top: 2rem;
+}
+
+.command-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    color: var(--vscode-sideBarTitle-foreground);
+    background-color: var(--vscode-sideBarSectionHeader-background);
+    padding: 0 0.5rem;
+}
+
+.command-trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    padding: 0 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--vscode-activityBar-inactiveForeground);
+}
+
+.command-trigger:hover {
+    text-decoration: none;
+    color: var(--vscode-activityBar-foreground);
+}
+
+.command-trigger:active {
+    font-size: 130%;
+}

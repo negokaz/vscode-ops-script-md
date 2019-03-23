@@ -14,9 +14,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('opsScriptMD.openOpsView', opsView(context));
-
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('opsScriptMD.openOpsView', opsView(context, vscode.ViewColumn.Active)),
+		vscode.commands.registerCommand('opsScriptMD.openOpsViewToTheSide', opsView(context, vscode.ViewColumn.Beside)),
+	);
 }
 
 // this method is called when your extension is deactivated

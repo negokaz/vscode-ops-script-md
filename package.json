@@ -10,7 +10,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:opsScriptMD.openOpsView"
+		"onCommand:opsScriptMD.openOpsView",
+		"onCommand:opsScriptMD.openOpsViewToTheSide"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -18,12 +19,20 @@
 			{
 				"command": "opsScriptMD.openOpsView",
 				"title": "OpsScriptMD: Open Ops View"
+			},
+			{
+				"command": "opsScriptMD.openOpsViewToTheSide",
+				"title": "OpsScriptMD: Open Ops View to the Side"
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
 					"command": "opsScriptMD.openOpsView",
+					"when": "editorLangId == markdown"
+				},
+				{
+					"command": "opsScriptMD.openOpsViewToTheSide",
 					"when": "editorLangId == markdown"
 				}
 			]
@@ -37,13 +46,18 @@
 		"test": "yarn run compile && node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
+		"@types/highlight.js": "^9.12.3",
+		"@types/markdown-it": "0.0.6",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
+		"@types/relaxed-json": "^1.0.0",
 		"tslint": "^5.12.1",
 		"typescript": "^3.3.1",
 		"vscode": "^1.1.28"
 	},
 	"dependencies": {
-		"markdown-it": "^8.4.2"
+		"highlight.js": "^9.15.6",
+		"markdown-it": "^8.4.2",
+		"relaxed-json": "^1.0.3"
 	}
 }
