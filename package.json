@@ -51,6 +51,7 @@
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
 		"@types/relaxed-json": "^1.0.0",
+		"@types/uuid": "^3.4.4",
 		"tslint": "^5.12.1",
 		"typescript": "^3.3.1",
 		"vscode": "^1.1.28"
@@ -58,6 +59,7 @@
 	"dependencies": {
 		"highlight.js": "^9.15.6",
 		"markdown-it": "^8.4.2",
-		"relaxed-json": "^1.0.3"
+		"relaxed-json": "^1.0.3",
+		"uuid": "^3.3.2"
 	}
 }

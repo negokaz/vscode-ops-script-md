@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as MarkdownIt from 'markdown-it';
+import ExtendedMarkdownIt from './markdown-it';
 import scriptChunk from './markdown-it-plugins/scriptChunk';
 import * as hljs from 'highlight.js';
+import ScriptChunkManager from './scriptChunkManager';
 
 const resourceDirectoryName = 'media';
 
@@ -35,13 +37,18 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 return '';
             }
         });
+        const tokens = md.parse(resource.getText(), {});
+        const manager = new ScriptChunkManager(tokens);
+        const mdOptions: MarkdownIt.Options = (md as ExtendedMarkdownIt).options;
         md.use(scriptChunk);
-        const content = md.render(resource.getText());
+        const content = md.renderer.render(manager.tokens, mdOptions, {});
         panel.webview.html = webviewContent(content, context);
         panel.webview.onDidReceiveMessage(
             message => {
                 switch (message.command) {
                     case 'executeCommand':
+                        console.log(`execute: ${message.scriptId}`);
+                        panel.webview.postMessage({ scriptId: message.scriptId });
                         return;
                 }
             },
@@ -59,6 +66,7 @@ function webviewContent(content: string, context: vscode.ExtensionContext): stri
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'markdown.css')}">
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'ops-view.css')}">
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'highlight.css')}">
+    <script src="${resourceUri(context, 'js', 'ops-view.js')}"></script>
 </head>
 <body>
     ${content}

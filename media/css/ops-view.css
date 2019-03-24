@@ -39,3 +39,7 @@ code {
 .command-trigger:active {
     font-size: 130%;
 }
+
+.command-trigger.running {
+    pointer-events: none;
+}
