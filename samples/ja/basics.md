@@ -4,9 +4,9 @@
 
 `cmd` に実行可能なプログラムのパスを指定すると Ops View から実行できるスクリプトになります。
 
-`args` にはプログラムの引数を列挙できます。
+引数はプログラムのパスに続いて指定できます。
 
-```bash {cmd: /bin/bash, args: ["-o", "errexit", "-c"]}
+```bash {cmd: ["/bin/bash", "-o", "errexit", "-c"]}
 echo 'Hello World!'
 ```
 

@@ -7,9 +7,8 @@ export default class ScriptChunk {
         const maybeSettings = /{.+}/.exec(token.info);
         if (maybeSettings && maybeSettings.length > 0 ) {
             const settings: any = RJSON.parse(maybeSettings[0]);
-            if (settings.cmd) {
-                const args = settings.args ? settings.args : [];
-                return new ScriptChunk(token.content, settings.cmd, args);
+            if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1));
             }
         }
         return new InvalidScriptChunk();
