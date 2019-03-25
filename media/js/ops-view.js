@@ -4,7 +4,10 @@ window.addEventListener('load', () => {
 
     document.querySelectorAll('a.command-trigger').forEach(trigger => {
         const scriptId = trigger.dataset.scriptId;
+        const output = trigger.parentElement.querySelector('.output');
         trigger.addEventListener('click', event => {
+            // reset output
+            output.innerHTML = '';
             trigger.classList.add('running');
             vscode.postMessage({
                 command: 'executeCommand',
@@ -12,10 +15,23 @@ window.addEventListener('load', () => {
             });
         });
     });
-    window.addEventListener('message', event => {
-        const scriptId = event.data.scriptId;
+    window.addEventListener('message', message => {
+        const event = message.data;
+        const scriptId = event.scriptId;
         const element =
             document.querySelector(`a.command-trigger[data-script-id="${scriptId}"]`);
-        element.classList.remove('running');
+        const output =
+            element.parentElement.querySelector('.output');
+        switch (event.event) {
+            case 'stdout':
+                output.innerText = output.innerText + event.data;
+                return;
+            case 'stderr':
+                output.innerText = output.innerText + event.data;
+                return;
+            case 'complete':
+                element.classList.remove('running');
+                return;
+        }
     });
 });

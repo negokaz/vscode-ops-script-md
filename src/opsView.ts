@@ -5,6 +5,7 @@ import ExtendedMarkdownIt from './markdown-it';
 import scriptChunk from './markdown-it-plugins/scriptChunk';
 import * as hljs from 'highlight.js';
 import ScriptChunkManager from './scriptChunkManager';
+import * as childProcess from "child_process";
 
 const resourceDirectoryName = 'media';
 
@@ -47,8 +48,19 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
             message => {
                 switch (message.command) {
                     case 'executeCommand':
-                        console.log(`execute: ${message.scriptId}`);
-                        panel.webview.postMessage({ scriptId: message.scriptId });
+                        const script = manager.getScript(message.scriptId);
+                        if (script) {
+                            const proc = childProcess.spawn(script.cmd, script.args.concat(script.script));
+                            proc.stdout.on('data', data => {
+                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: data.toString() });
+                            });
+                            proc.stderr.on('data', data => {
+                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: data.toString() });
+                            });
+                            proc.on('close', code => {
+                                panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
+                            });
+                        }
                         return;
                 }
             },

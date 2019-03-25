@@ -7,7 +7,7 @@
 引数はプログラムのパスに続いて指定できます。
 
 ```bash {cmd: ["/bin/bash", "-o", "errexit", "-c"]}
-echo 'Hello World!'
+ls -al
 ```
 
 ## 単なるコードスニペット
