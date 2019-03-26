@@ -55,7 +55,11 @@
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMjcuMSAxNC4zMTNWNS4zOTZMMjQuMTU4IDguMzRjLTIuMzMtMi4zMjUtNS4wMzMtMy41MDMtOC4xMS0zLjUwM0M5LjkwMiA0LjgzNyA0LjkwMSA5Ljg0NyA0Ljg5OSAxNmMuMDAxIDYuMTUyIDUuMDAzIDExLjE1OCAxMS4xNSAxMS4xNiA0LjI3NiAwIDkuMzY5LTIuMjI3IDEwLjgzNi04LjQ3OGwuMDI4LS4xMjJoLTMuMjNsLS4wMjIuMDY4Yy0xLjA3OCAzLjI0Mi00LjEzOCA1LjQyMS03LjYxMyA1LjQyMWE4IDggMCAwIDEtNS42OTEtMi4zNTlBNy45OTMgNy45OTMgMCAwIDEgOCAxNi4wMDFjMC00LjQzOCAzLjYxMS04LjA0OSA4LjA1LTguMDQ5IDIuMDY5IDAgMy42MzguNTggNS45MjQgMi41NzNsLTMuNzkyIDMuNzg5SDI3LjF6Ii8+PC9zdmc+');
 }
 
-.script-chunk .output {
+.ready.script-chunk .output {
+    display: none;
+}
+
+.running.script-chunk .output, .ran.script-chunk .output {
     max-height: 20rem;
     overflow: scroll;
 }

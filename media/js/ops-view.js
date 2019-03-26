@@ -11,6 +11,7 @@ window.addEventListener('load', () => {
             if (output.firstChild) {
                 output.removeChild(output.firstChild);
             }
+            scriptChunk.classList.remove('ready', 'ran');
             scriptChunk.classList.add('running');
             vscode.postMessage({
                 command: 'executeCommand',
