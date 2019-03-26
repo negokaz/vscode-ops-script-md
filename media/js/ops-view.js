@@ -32,6 +32,8 @@ window.addEventListener('load', () => {
             case 'complete':
                 element.classList.remove('running');
                 return;
+            case 'error':
+                output.innerText = output.innerText + event.name + '\n' + event.message;
         }
     });
 });

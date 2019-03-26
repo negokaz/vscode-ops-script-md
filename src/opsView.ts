@@ -61,6 +61,9 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                             proc.on('close', code => {
                                 panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
                             });
+                            proc.on('error', err => {
+                                panel.webview.postMessage({ event: 'error', scriptId: message.scriptId, name: err.name, message: err.message });
+                            });
                         }
                         return;
                 }
