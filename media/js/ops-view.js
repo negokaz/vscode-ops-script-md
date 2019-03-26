@@ -2,15 +2,16 @@ window.addEventListener('load', () => {
     
     const vscode = acquireVsCodeApi();
 
-    document.querySelectorAll('a.command-trigger').forEach(trigger => {
-        const scriptId = trigger.dataset.scriptId;
-        const output = trigger.parentElement.querySelector('.output-inner');
+    document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
+        const scriptChunk = trigger.closest('.script-chunk');
+        const scriptId = scriptChunk.dataset.scriptId;
+        const output = scriptChunk.querySelector('.output-inner');
         trigger.addEventListener('click', event => {
             // reset output
             if (output.firstChild) {
                 output.removeChild(output.firstChild);
             }
-            trigger.classList.add('running');
+            scriptChunk.classList.add('running');
             vscode.postMessage({
                 command: 'executeCommand',
                 scriptId: scriptId,
@@ -20,10 +21,9 @@ window.addEventListener('load', () => {
     window.addEventListener('message', message => {
         const event = message.data;
         const scriptId = event.scriptId;
-        const element =
-            document.querySelector(`a.command-trigger[data-script-id="${scriptId}"]`);
-        const output =
-            element.parentElement.querySelector('.output-inner');
+        const scriptChunk =
+            document.querySelector(`.script-chunk[data-script-id="${scriptId}"]`);
+        const output = scriptChunk.querySelector('.output-inner');
         switch (event.event) {
             case 'stdout':
                 output.insertAdjacentText('beforeend', event.data);
@@ -32,8 +32,8 @@ window.addEventListener('load', () => {
                 output.insertAdjacentText('beforeend', event.data);
                 return;
             case 'complete':
-                element.classList.remove('running', 'ran');
-                element.classList.add('ran');
+                scriptChunk.classList.remove('running', 'ran');
+                scriptChunk.classList.add('ran');
                 return;
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
