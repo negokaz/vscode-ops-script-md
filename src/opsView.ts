@@ -53,10 +53,10 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                         if (script) {
                             const proc = childProcess.spawn(script.cmd, script.args.concat(script.script));
                             proc.stdout.on('data', data => {
-                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding) });
+                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
                             });
                             proc.stderr.on('data', data => {
-                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding) });
+                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
                             });
                             proc.on('close', code => {
                                 panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
