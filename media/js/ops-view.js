@@ -7,7 +7,9 @@ window.addEventListener('load', () => {
         const output = trigger.parentElement.querySelector('.output-inner');
         trigger.addEventListener('click', event => {
             // reset output
-            output.innerHTML = '';
+            if (output.firstChild) {
+                output.removeChild(output.firstChild);
+            }
             trigger.classList.add('running');
             vscode.postMessage({
                 command: 'executeCommand',
@@ -24,17 +26,17 @@ window.addEventListener('load', () => {
             element.parentElement.querySelector('.output-inner');
         switch (event.event) {
             case 'stdout':
-                output.innerText = output.innerText + event.data;
+                output.insertAdjacentText('beforeend', event.data);
                 return;
             case 'stderr':
-                output.innerText = output.innerText + event.data;
+                output.insertAdjacentText('beforeend', event.data);
                 return;
             case 'complete':
                 element.classList.remove('running', 'ran');
                 element.classList.add('ran');
                 return;
             case 'error':
-                output.innerText = output.innerText + event.name + '\n' + event.message;
+                output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
         }
     });
 });
