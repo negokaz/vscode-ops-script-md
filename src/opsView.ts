@@ -6,6 +6,7 @@ import scriptChunk from './markdown-it-plugins/scriptChunk';
 import * as hljs from 'highlight.js';
 import ScriptChunkManager from './scriptChunkManager';
 import * as childProcess from "child_process";
+import * as iconv from 'iconv-jschardet';
 
 const resourceDirectoryName = 'media';
 
@@ -52,10 +53,10 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                         if (script) {
                             const proc = childProcess.spawn(script.cmd, script.args.concat(script.script));
                             proc.stdout.on('data', data => {
-                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: data.toString() });
+                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding) });
                             });
                             proc.stderr.on('data', data => {
-                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: data.toString() });
+                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding) });
                             });
                             proc.on('close', code => {
                                 panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });

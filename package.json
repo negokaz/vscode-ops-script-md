@@ -57,7 +57,9 @@
 		"vscode": "^1.1.28"
 	},
 	"dependencies": {
+		"@types/iconv-lite": "^0.0.1",
 		"highlight.js": "^9.15.6",
+		"iconv-jschardet": "^1.0.8",
 		"markdown-it": "^8.4.2",
 		"relaxed-json": "^1.0.3",
 		"uuid": "^3.3.2"
