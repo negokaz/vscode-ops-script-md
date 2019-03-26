@@ -30,7 +30,8 @@ window.addEventListener('load', () => {
                 output.innerText = output.innerText + event.data;
                 return;
             case 'complete':
-                element.classList.remove('running');
+                element.classList.remove('running', 'ran');
+                element.classList.add('ran');
                 return;
             case 'error':
                 output.innerText = output.innerText + event.name + '\n' + event.message;

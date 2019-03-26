@@ -12,7 +12,7 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
             return `
             <div class="command-box">
                 <span class="command-label">${chunk.commandLine}</span>
-                <a class="command-trigger" title="run" ${ScriptChunkManger.SCRIPT_ID_ATTR_NAME}="${scriptId}" >▶</a>
+                <a class="command-trigger" title="run" ${ScriptChunkManger.SCRIPT_ID_ATTR_NAME}="${scriptId}" ></a>
                 ${defaultRender(tokens, index, options, env, self)}
                 <div class="output"></div>
             </div>
