@@ -4,7 +4,7 @@ window.addEventListener('load', () => {
 
     document.querySelectorAll('a.command-trigger').forEach(trigger => {
         const scriptId = trigger.dataset.scriptId;
-        const output = trigger.parentElement.querySelector('.output');
+        const output = trigger.parentElement.querySelector('.output-inner');
         trigger.addEventListener('click', event => {
             // reset output
             output.innerHTML = '';
@@ -21,7 +21,7 @@ window.addEventListener('load', () => {
         const element =
             document.querySelector(`a.command-trigger[data-script-id="${scriptId}"]`);
         const output =
-            element.parentElement.querySelector('.output');
+            element.parentElement.querySelector('.output-inner');
         switch (event.event) {
             case 'stdout':
                 output.innerText = output.innerText + event.data;
