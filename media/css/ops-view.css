@@ -1,7 +1,3 @@
-code {
-    font-family: var(--vscode-editor-font-family);
-}
-
 .command-box {
     position:relative;
 }
