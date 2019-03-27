@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as iconv from 'iconv-jschardet';
 import MarkdownEngine from './markdown/markdownEngine';
+import * as PubSub from 'pubsub-js';
+import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed } from './scriptChunk/processEvents';
 
 const resourceDirectoryName = 'media';
 
@@ -24,6 +26,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 enableScripts: true,
             }
         );
+        subscribeEvents(panel.webview);
         const md = new MarkdownEngine();
         const [content, manager] = md.render(resource.getText());
         panel.webview.html = webviewContent(content, context);
@@ -34,16 +37,16 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                     case 'executeCommand':
                         const proc = scriptChunk.spawnProcess();
                         proc.stdout.on('data', data => {
-                            panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
+                            PubSub.publish(StdoutProduced.topic, new StdoutProduced(message.scriptId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });
                         proc.stderr.on('data', data => {
-                            panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
+                            PubSub.publish(StderrProduced.topic, new StderrProduced(message.scriptId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });
                         proc.on('close', code => {
-                            panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
+                            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(message.scriptId, code));
                         });
                         proc.on('error', err => {
-                            panel.webview.postMessage({ event: 'error', scriptId: message.scriptId, name: err.name, message: err.message });
+                            PubSub.publish(SpawnFailed.topic, new SpawnFailed(message.scriptId, err));
                         });
                         return;
                     case 'killScriptChunk':
@@ -79,4 +82,19 @@ function resourceUri(context: vscode.ExtensionContext, ...pathElements: string[]
         path.join(context.extensionPath, resourceDirectoryName, path.join(...pathElements))
     );
     return onDiskPath.with({ scheme: 'vscode-resource' });
+}
+
+function subscribeEvents(webview: vscode.Webview) {
+    PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
+        webview.postMessage({ event: 'stdout', scriptId: event.scriptChunkId, data: event.data });
+    });
+    PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
+        webview.postMessage({ event: 'stderr', scriptId: event.scriptChunkId, data: event.data });
+    });
+    PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
+        webview.postMessage({ event: 'complete', scriptId: event.scriptChunkId, code: event.exitCode });
+    });
+    PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
+        webview.postMessage({ event: 'error', scriptId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
+    });
 }
