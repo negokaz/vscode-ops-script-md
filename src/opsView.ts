@@ -46,9 +46,10 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
         panel.webview.html = webviewContent(content, context);
         panel.webview.onDidReceiveMessage(
             message => {
+                const scriptChunk = manager.getScript(message.scriptId);
                 switch (message.command) {
                     case 'executeCommand':
-                        const proc = manager.spawnProcess(message.scriptId);
+                        const proc = scriptChunk.spawnProcess();
                         proc.stdout.on('data', data => {
                             panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
                         });
@@ -63,7 +64,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                         });
                         return;
                     case 'killScriptChunk':
-                        manager.killProcess(message.scriptId);
+                        scriptChunk.killProcess();
                         return;
                 }
             },
