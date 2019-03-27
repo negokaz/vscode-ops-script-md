@@ -35,7 +35,7 @@ window.addEventListener('load', () => {
 
     document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
         const scriptChunk = trigger.closest('.script-chunk');
-        const scriptChunkId = scriptChunk.id;
+        const scriptChunkId = scriptChunk.dataset.scriptChunkId;
         trigger.addEventListener('click', event => {
             if (scriptChunk.classList.contains('ready') || scriptChunk.classList.contains('ran')) {
                 executeScriptChunk(scriptChunkId, scriptChunk);
@@ -47,7 +47,8 @@ window.addEventListener('load', () => {
     window.addEventListener('message', message => {
         const event = message.data;
         const scriptChunkId = event.scriptChunkId;
-        const scriptChunk = document.querySelector(`.script-chunk#${scriptChunkId}`);
+        const scriptChunk =
+            document.querySelector(`.script-chunk[data-script-chunk-id=${scriptChunkId}]`);
         const output = scriptChunk.querySelector('.output-inner');
         const outputOuter = scriptChunk.querySelector('.output');
         const shouldScroll = elementShouldScroll(outputOuter);
