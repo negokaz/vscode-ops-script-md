@@ -35,7 +35,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 const scriptChunkId = message.scriptChunkId;
                 const scriptChunk = manager.getScriptChunk(scriptChunkId);
                 switch (message.command) {
-                    case 'executeCommand':
+                    case 'executeScriptChunk':
                         const proc = scriptChunk.spawnProcess();
                         proc.stdout.on('data', data => {
                             PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));

@@ -9,7 +9,7 @@ window.addEventListener('load', () => {
         scriptChunkElement.classList.remove('ready', 'ran');
         scriptChunkElement.classList.add('running');
         vscode.postMessage({
-            command: 'executeCommand',
+            command: 'executeScriptChunk',
             scriptChunkId: scriptChunkId,
         });
     }
@@ -48,7 +48,7 @@ window.addEventListener('load', () => {
         const event = message.data;
         const scriptChunkId = event.scriptChunkId;
         const scriptChunk =
-            document.querySelector(`.script-chunk[data-script-chunk-id=${scriptChunkId}]`);
+            document.querySelector(`.script-chunk[data-script-chunk-id="${scriptChunkId}"]`);
         const output = scriptChunk.querySelector('.output-inner');
         const outputOuter = scriptChunk.querySelector('.output');
         const shouldScroll = elementShouldScroll(outputOuter);
