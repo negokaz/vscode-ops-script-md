@@ -1,6 +1,6 @@
 import { MarkdownIt, Token, Renderer } from 'markdown-it';
-import ScriptChunk from '../scriptChunk';
-import ScriptChunkManger from '../scriptChunkManager';
+import ScriptChunk from '../scriptChunk/scriptChunk';
+import ScriptChunkManger from '../scriptChunk/scriptChunkManager';
 
 export default function markdownItScriptChunk(md: MarkdownIt) {
     const defaultRender = md.renderer.rules.fence;

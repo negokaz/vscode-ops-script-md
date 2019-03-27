@@ -1,11 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as MarkdownIt from 'markdown-it';
-import ExtendedMarkdownIt from './markdown-it';
-import scriptChunk from './markdown-it-plugins/scriptChunk';
-import * as hljs from 'highlight.js';
-import ScriptChunkManager from './scriptChunkManager';
 import * as iconv from 'iconv-jschardet';
+import MarkdownEngine from './markdown/markdownEngine';
 
 const resourceDirectoryName = 'media';
 
@@ -28,21 +24,8 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 enableScripts: true,
             }
         );
-        const md = new MarkdownIt({
-            highlight: (str, lang) => {
-                if (lang && hljs.getLanguage(lang)) {
-                    try {
-                        return hljs.highlight(lang, str).value;
-                    } catch (__) {}
-                }
-                return '';
-            }
-        });
-        const tokens = md.parse(resource.getText(), {});
-        const manager = new ScriptChunkManager(tokens);
-        const mdOptions: MarkdownIt.Options = (md as ExtendedMarkdownIt).options;
-        md.use(scriptChunk);
-        const content = md.renderer.render(manager.tokens, mdOptions, {});
+        const md = new MarkdownEngine();
+        const [content, manager] = md.render(resource.getText());
         panel.webview.html = webviewContent(content, context);
         panel.webview.onDidReceiveMessage(
             message => {
