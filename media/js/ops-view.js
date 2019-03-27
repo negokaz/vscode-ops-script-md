@@ -21,6 +21,18 @@ window.addEventListener('load', () => {
         });
     }
 
+    function scrollTopMax(element) {
+        return element.scrollHeight - element.clientHeight;
+    }
+
+    function elementShouldScroll(element) {
+        return scrollTopMax(element) - element.scrollTop < 1;
+    }
+
+    function scrollToBottom(element) {
+        element.scrollTop = scrollTopMax(element);
+    }
+
     document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
         const scriptChunk = trigger.closest('.script-chunk');
         const scriptId = scriptChunk.dataset.scriptId;
@@ -38,19 +50,25 @@ window.addEventListener('load', () => {
         const scriptChunk =
             document.querySelector(`.script-chunk[data-script-id="${scriptId}"]`);
         const output = scriptChunk.querySelector('.output-inner');
+        const outputOuter = scriptChunk.querySelector('.output');
+        const shouldScroll = elementShouldScroll(outputOuter);
         switch (event.event) {
             case 'stdout':
                 output.insertAdjacentText('beforeend', event.data);
-                return;
+                break;
             case 'stderr':
                 output.insertAdjacentText('beforeend', event.data);
-                return;
+                break;
             case 'complete':
                 scriptChunk.classList.remove('running', 'ran');
                 scriptChunk.classList.add('ran');
-                return;
+                break;
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
+                break;
+        }
+        if (shouldScroll) {
+            scrollToBottom(outputOuter);
         }
     });
 });
