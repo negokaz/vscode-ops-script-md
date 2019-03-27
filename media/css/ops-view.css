@@ -47,7 +47,6 @@
 }
 
 .running.script-chunk .script-chunk-trigger {
-    pointer-events: none;
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNOCA4aDE2djE2SDh6Ii8+PC9zdmc+');
 }
 

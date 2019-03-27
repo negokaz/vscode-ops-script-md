@@ -49,22 +49,22 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
             message => {
                 switch (message.command) {
                     case 'executeCommand':
-                        const script = manager.getScript(message.scriptId);
-                        if (script) {
-                            const proc = childProcess.spawn(script.cmd, script.args.concat(script.script));
-                            proc.stdout.on('data', data => {
-                                panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
-                            });
-                            proc.stderr.on('data', data => {
-                                panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
-                            });
-                            proc.on('close', code => {
-                                panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
-                            });
-                            proc.on('error', err => {
-                                panel.webview.postMessage({ event: 'error', scriptId: message.scriptId, name: err.name, message: err.message });
-                            });
-                        }
+                        const proc = manager.spawnProcess(message.scriptId);
+                        proc.stdout.on('data', data => {
+                            panel.webview.postMessage({ event: 'stdout', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
+                        });
+                        proc.stderr.on('data', data => {
+                            panel.webview.postMessage({ event: 'stderr', scriptId: message.scriptId, data: iconv.decode(data, iconv.detect(data).encoding).toString() });
+                        });
+                        proc.on('close', code => {
+                            panel.webview.postMessage({ event: 'complete', scriptId: message.scriptId, code: code });
+                        });
+                        proc.on('error', err => {
+                            panel.webview.postMessage({ event: 'error', scriptId: message.scriptId, name: err.name, message: err.message });
+                        });
+                        return;
+                    case 'killScriptChunk':
+                        manager.killProcess(message.scriptId);
                         return;
                 }
             },

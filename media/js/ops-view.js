@@ -2,21 +2,34 @@ window.addEventListener('load', () => {
     
     const vscode = acquireVsCodeApi();
 
+    function executeScriptChunk(scriptId, scriptChunkElement) {
+        const output = scriptChunkElement.querySelector('.output-inner');
+        // reset output
+        output.childNodes.forEach(e => output.removeChild(e))
+        scriptChunkElement.classList.remove('ready', 'ran');
+        scriptChunkElement.classList.add('running');
+        vscode.postMessage({
+            command: 'executeCommand',
+            scriptId: scriptId,
+        });
+    }
+
+    function killScriptChunk(scriptId, scriptChunkElement) {
+        vscode.postMessage({
+            command: 'killScriptChunk',
+            scriptId: scriptId,
+        });
+    }
+
     document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
         const scriptChunk = trigger.closest('.script-chunk');
         const scriptId = scriptChunk.dataset.scriptId;
-        const output = scriptChunk.querySelector('.output-inner');
         trigger.addEventListener('click', event => {
-            // reset output
-            if (output.firstChild) {
-                output.removeChild(output.firstChild);
+            if (scriptChunk.classList.contains('ready') || scriptChunk.classList.contains('ran')) {
+                executeScriptChunk(scriptId, scriptChunk);
+            } else if (scriptChunk.classList.contains('running')) {
+                killScriptChunk(scriptId, scriptChunk);
             }
-            scriptChunk.classList.remove('ready', 'ran');
-            scriptChunk.classList.add('running');
-            vscode.postMessage({
-                command: 'executeCommand',
-                scriptId: scriptId,
-            });
         });
     });
     window.addEventListener('message', message => {
