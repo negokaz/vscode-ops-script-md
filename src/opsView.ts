@@ -10,7 +10,7 @@ import * as iconv from 'iconv-jschardet';
 const resourceDirectoryName = 'media';
 
 export default function openOpsView(context: vscode.ExtensionContext, viewColumn: vscode.ViewColumn) {
-
+    iconv.disableCodecDataWarn();
     return () => {
         if (!vscode.window.activeTextEditor) {
             vscode.window.showErrorMessage("None active text editor.");
