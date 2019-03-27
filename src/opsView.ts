@@ -5,7 +5,6 @@ import ExtendedMarkdownIt from './markdown-it';
 import scriptChunk from './markdown-it-plugins/scriptChunk';
 import * as hljs from 'highlight.js';
 import ScriptChunkManager from './scriptChunkManager';
-import * as childProcess from "child_process";
 import * as iconv from 'iconv-jschardet';
 
 const resourceDirectoryName = 'media';
