@@ -5,7 +5,7 @@ window.addEventListener('load', () => {
     function executeScriptChunk(scriptChunkId, scriptChunkElement) {
         const output = scriptChunkElement.querySelector('.output-inner');
         // reset output
-        output.childNodes.forEach(e => output.removeChild(e))
+        output.innerHTML = "";
         scriptChunkElement.classList.remove('ready', 'ran');
         scriptChunkElement.classList.add('running');
         vscode.postMessage({
