@@ -2,7 +2,7 @@ window.addEventListener('load', () => {
     
     const vscode = acquireVsCodeApi();
 
-    function executeScriptChunk(scriptId, scriptChunkElement) {
+    function executeScriptChunk(scriptChunkId, scriptChunkElement) {
         const output = scriptChunkElement.querySelector('.output-inner');
         // reset output
         output.childNodes.forEach(e => output.removeChild(e))
@@ -10,14 +10,14 @@ window.addEventListener('load', () => {
         scriptChunkElement.classList.add('running');
         vscode.postMessage({
             command: 'executeCommand',
-            scriptId: scriptId,
+            scriptChunkId: scriptChunkId,
         });
     }
 
-    function killScriptChunk(scriptId, scriptChunkElement) {
+    function killScriptChunk(scriptChunkId, scriptChunkElement) {
         vscode.postMessage({
             command: 'killScriptChunk',
-            scriptId: scriptId,
+            scriptChunkId: scriptChunkId,
         });
     }
 
@@ -35,20 +35,19 @@ window.addEventListener('load', () => {
 
     document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
         const scriptChunk = trigger.closest('.script-chunk');
-        const scriptId = scriptChunk.dataset.scriptId;
+        const scriptChunkId = scriptChunk.id;
         trigger.addEventListener('click', event => {
             if (scriptChunk.classList.contains('ready') || scriptChunk.classList.contains('ran')) {
-                executeScriptChunk(scriptId, scriptChunk);
+                executeScriptChunk(scriptChunkId, scriptChunk);
             } else if (scriptChunk.classList.contains('running')) {
-                killScriptChunk(scriptId, scriptChunk);
+                killScriptChunk(scriptChunkId, scriptChunk);
             }
         });
     });
     window.addEventListener('message', message => {
         const event = message.data;
-        const scriptId = event.scriptId;
-        const scriptChunk =
-            document.querySelector(`.script-chunk[data-script-id="${scriptId}"]`);
+        const scriptChunkId = event.scriptChunkId;
+        const scriptChunk = document.querySelector(`.script-chunk#${scriptChunkId}`);
         const output = scriptChunk.querySelector('.output-inner');
         const outputOuter = scriptChunk.querySelector('.output');
         const shouldScroll = elementShouldScroll(outputOuter);

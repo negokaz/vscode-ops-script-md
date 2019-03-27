@@ -6,11 +6,11 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
     const defaultRender = md.renderer.rules.fence;
     md.renderer.rules.fence = (tokens: Token[], index: number, options: any, env: any, self: Renderer) => {
         const token = tokens[index];
-        const scriptId = token.attrGet(ScriptChunkManger.SCRIPT_ID_ATTR_NAME);
-        if (scriptId) {
+        const scriptChunkId = token.attrGet(ScriptChunkManger.SCRIPT_CHUNK_ID_ATTR_NAME);
+        if (scriptChunkId) {
             const chunk = ScriptChunk.parse(token);
             return `
-            <div class="ready script-chunk" ${ScriptChunkManger.SCRIPT_ID_ATTR_NAME}="${scriptId}">
+            <div id="${scriptChunkId}" class="ready script-chunk">
                 <span class="script-chunk-label">${chunk.commandLine}</span>
                 <a class="script-chunk-trigger" title="run"></a>
                 ${defaultRender(tokens, index, options, env, self)}

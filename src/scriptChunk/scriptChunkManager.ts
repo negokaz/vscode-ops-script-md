@@ -4,36 +4,36 @@ import ScriptChunk from './scriptChunk';
 
 export default class ScriptChunkManager {
 
-    public static readonly SCRIPT_ID_ATTR_NAME = "data-script-id";
+    public static readonly SCRIPT_CHUNK_ID_ATTR_NAME = "data-script-chunk-id";
 
     public readonly tokens: Token[];
     
-    scripts: Map<string, ScriptChunk> = new Map();
+    scriptChunks: Map<string, ScriptChunk> = new Map();
 
     constructor(tokens: Token[]) {
-        this.tokens = this.assignScriptIds(tokens);
+        this.tokens = this.assignScriptChunkIds(tokens);
     }
 
-    assignScriptIds(tokens: Token[]): Token[] {
+    assignScriptChunkIds(tokens: Token[]): Token[] {
         return tokens.map(token => {
             if (token.type === 'fence') {
                 const chunk = ScriptChunk.parse(token);
                 if (chunk.isRunnable) {
-                    const scriptId = uuidv4();
-                    token.attrSet(ScriptChunkManager.SCRIPT_ID_ATTR_NAME, scriptId);
-                    this.scripts.set(scriptId, chunk);
+                    const scriptChunkId = uuidv4();
+                    token.attrSet(ScriptChunkManager.SCRIPT_CHUNK_ID_ATTR_NAME, scriptChunkId);
+                    this.scriptChunks.set(scriptChunkId, chunk);
                 }
             }
             return token;
         });  
     }
 
-    public getScript(scriptId: string): ScriptChunk {
-        const script =  this.scripts.get(scriptId);
-        if (script) {
-            return script;
+    public getScriptChunk(scriptChunkId: string): ScriptChunk {
+        const scriptChunk =  this.scriptChunks.get(scriptChunkId);
+        if (scriptChunk) {
+            return scriptChunk;
         } else {
-            throw new Error(`Illegal scriptId: ${scriptId}`);
+            throw new Error(`Illegal scriptChunkId: ${scriptChunkId}`);
         }
     }
 }

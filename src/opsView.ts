@@ -32,21 +32,22 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
         panel.webview.html = webviewContent(content, context);
         panel.webview.onDidReceiveMessage(
             message => {
-                const scriptChunk = manager.getScript(message.scriptId);
+                const scriptChunkId = message.scriptChunkId;
+                const scriptChunk = manager.getScriptChunk(scriptChunkId);
                 switch (message.command) {
                     case 'executeCommand':
                         const proc = scriptChunk.spawnProcess();
                         proc.stdout.on('data', data => {
-                            PubSub.publish(StdoutProduced.topic, new StdoutProduced(message.scriptId, iconv.decode(data, iconv.detect(data).encoding).toString()));
+                            PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });
                         proc.stderr.on('data', data => {
-                            PubSub.publish(StderrProduced.topic, new StderrProduced(message.scriptId, iconv.decode(data, iconv.detect(data).encoding).toString()));
+                            PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });
                         proc.on('close', code => {
-                            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(message.scriptId, code));
+                            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code));
                         });
                         proc.on('error', err => {
-                            PubSub.publish(SpawnFailed.topic, new SpawnFailed(message.scriptId, err));
+                            PubSub.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
                         });
                         return;
                     case 'killScriptChunk':
@@ -86,15 +87,15 @@ function resourceUri(context: vscode.ExtensionContext, ...pathElements: string[]
 
 function subscribeEvents(webview: vscode.Webview) {
     PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
-        webview.postMessage({ event: 'stdout', scriptId: event.scriptChunkId, data: event.data });
+        webview.postMessage({ event: 'stdout', scriptChunkId: event.scriptChunkId, data: event.data });
     });
     PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
-        webview.postMessage({ event: 'stderr', scriptId: event.scriptChunkId, data: event.data });
+        webview.postMessage({ event: 'stderr', scriptChunkId: event.scriptChunkId, data: event.data });
     });
     PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
-        webview.postMessage({ event: 'complete', scriptId: event.scriptChunkId, code: event.exitCode });
+        webview.postMessage({ event: 'complete', scriptChunkId: event.scriptChunkId, code: event.exitCode });
     });
     PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
-        webview.postMessage({ event: 'error', scriptId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
+        webview.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
     });
 }
