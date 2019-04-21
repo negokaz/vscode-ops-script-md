@@ -119,9 +119,11 @@ function subscribeEvents(webview: vscode.Webview) {
 }
 
 function publishLog(manager: ScriptChunkManager, logPath: string) {
-    const logs: any = jsYaml.safeLoad(fs.readFileSync(logPath, 'utf8'));
-    for (let id in logs) {
-        PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output));
+    if (fs.existsSync(logPath)) {
+        const logs: any = jsYaml.safeLoad(fs.readFileSync(logPath, 'utf8'));
+        for (let id in logs) {
+            PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output));
+        }
     }
 }
 
