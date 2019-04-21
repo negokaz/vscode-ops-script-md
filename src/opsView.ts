@@ -22,7 +22,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
 
         const panel = vscode.window.createWebviewPanel(
             'OpsView',
-            'Ops View',
+            'OpsView: ' + path.basename(resource.uri.path),
             viewColumn,
             {
                 localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, resourceDirectoryName))],
