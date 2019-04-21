@@ -1,65 +1,44 @@
-# opsscriptmd README
+# OpsScriptMD
 
-This is the README for your extension "opsscriptmd". After writing up a brief description, we recommend including the following sections.
+半自動化のためのドキュメンテーションツール
 
-## Features
+## モチベーション
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+顧客へ安定したサービスを提供するためには、本番環境の運用作業で発生するミスをできるだけ減らすことが重要です。全ての運用作業が完全に自動化され、十分に検証されていれば理想的ですが、そもそも自動化されていなかったり、自動化された内容に不備があるかもしれません。
 
-For example if there is an image subfolder under your extension project workspace:
+運用作業を**半自動化**することで手作業につきまとうヒューマンエラーのリスクを減らせます。もしくは、自動化された作業の全てが終わってから事故に気付くのではなく、各作業がうまくいったか人が確認しながら着実に作業を進めることができます。
 
-\!\[feature X\]\(images/feature-x.png\)
+## このツールが実現すること
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+このツールは Markdown で書かれた作業手順書内のスクリプトを直接実行できるようにすることで、運用作業の半自動化を実現します。
 
-## Requirements
+- 運用作業手順を事前にレビューできます
+- 結果を確認しながらステップバイステップで運用作業を実行できます
+- 作業履歴を確認できます
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## インストール
 
-## Extension Settings
+1. [Visual Studio Code](https://code.visualstudio.com/) をインストール
+2. Visual Studio Code のマーケットプレイスから「OpsScriptMD」をインストール
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## 使い方
 
-For example:
+### 運用作業手順書を書く
 
-This extension contributes the following settings:
+手順書のサンプルが [samples](samples) にあります。
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+### 運用作業を実施
 
-## Known Issues
+Markdown ドキュメントを開いた状態で `F1` キーを押下し、「OpsScriptMD: Open OpsView」を選択します。
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+![](docs/images/open-opsview.png)
 
-## Release Notes
+スクリプトの領域にある再生ボタンをクリックするとスクリプトが実行されます。
 
-Users appreciate release notes as you update your extension.
+![](docs/images/script-chunk.png)
 
-### 1.0.0
+## ライセンス
 
-Initial release of ...
+Copyright (c) 2019 Kazuki Negoro
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+OpsScriptMD は [MIT ライセンス](./LICENSE) の下にリリースされています。
