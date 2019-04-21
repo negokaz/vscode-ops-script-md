@@ -9,6 +9,10 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"Markdown",
+		"Operations"
+	],
 	"activationEvents": [
 		"onCommand:opsScriptMD.openOpsView",
 		"onCommand:opsScriptMD.openOpsViewToTheSide"
