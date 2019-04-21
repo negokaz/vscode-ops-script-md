@@ -5,6 +5,22 @@ interface ProcessEvent {
     scriptChunkId: string;
 }
 
+export class ExecutionStarted implements ProcessEvent {
+
+    public static topic = "ExecutionStarted";
+
+    public readonly eventName = ExecutionStarted.topic;
+
+    public readonly scriptChunkId: string;
+
+    public readonly startTime: Date;
+
+    constructor(scriptChunkId: string, startTime: Date) {
+        this.scriptChunkId = scriptChunkId;
+        this.startTime = startTime;
+    }
+}
+
 export class StdoutProduced implements ProcessEvent {
 
     public static topic = "StdoutProduced";
@@ -63,8 +79,27 @@ export class ProcessCompleted implements ProcessEvent {
 
     public readonly exitCode: number;
 
-    constructor(scriptChunkId: string, exitCode: number) {
+    public readonly endTime: Date;
+
+    constructor(scriptChunkId: string, exitCode: number, endTime: Date) {
         this.scriptChunkId = scriptChunkId;
         this.exitCode = exitCode;
+        this.endTime = endTime;
+    }
+}
+
+export class LogLoaded implements ProcessEvent {
+
+    public static topic = "LogLoaded";
+
+    public readonly eventName = LogLoaded.topic;
+
+    public readonly scriptChunkId: string;
+
+    public readonly output: string;
+
+    constructor(scriptChunkId: string, output: string) {
+        this.scriptChunkId = scriptChunkId;
+        this.output = output;
     }
 }

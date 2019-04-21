@@ -3,7 +3,10 @@ import * as path from 'path';
 import * as iconv from 'iconv-jschardet';
 import MarkdownEngine from './markdown/markdownEngine';
 import * as PubSub from 'pubsub-js';
-import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed } from './scriptChunk/processEvents';
+import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
+import ScriptChunkManager from './scriptChunk/scriptChunkManager';
+import * as jsYaml from 'js-yaml';
+import * as fs from 'fs';
 
 const resourceDirectoryName = 'media';
 
@@ -24,6 +27,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
             {
                 localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, resourceDirectoryName))],
                 enableScripts: true,
+                retainContextWhenHidden: true,
             }
         );
         subscribeEvents(panel.webview);
@@ -36,6 +40,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 const scriptChunk = manager.getScriptChunk(scriptChunkId);
                 switch (message.command) {
                     case 'executeScriptChunk':
+                        PubSub.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
                         const proc = scriptChunk.spawnProcess();
                         proc.stdout.on('data', data => {
                             PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
@@ -44,7 +49,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                             PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });
                         proc.on('close', code => {
-                            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code));
+                            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code, new Date()));
                         });
                         proc.on('error', err => {
                             PubSub.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
@@ -58,6 +63,16 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
             undefined,
             context.subscriptions
         );
+        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+            const rootPath = vscode.workspace.workspaceFolders[0].uri.path;
+            const logDir = path.join(rootPath, 'logs');
+            if (!fs.existsSync(logDir)) {
+                fs.mkdirSync(logDir);
+            }
+            const logFilename = path.basename(resource.uri.path, path.extname(resource.uri.path)) + '.log.yml';
+            publishLog(manager, path.join(logDir, logFilename));
+            subscribeToPersistEvents(manager, path.join(logDir, logFilename));
+        }
     };
 }
 
@@ -97,5 +112,54 @@ function subscribeEvents(webview: vscode.Webview) {
     });
     PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
         webview.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
+    });
+    PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
+        webview.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output });
+    });
+}
+
+function publishLog(manager: ScriptChunkManager, logPath: string) {
+    const logs: any = jsYaml.safeLoad(fs.readFileSync(logPath, 'utf8'));
+    for (let id in logs) {
+        PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output));
+    }
+}
+
+function subscribeToPersistEvents(manager: ScriptChunkManager, logPath: string) {
+    const logs: any = {};
+    
+    function getLog(scriptChunkId: string) {
+        const log = logs[scriptChunkId] ? logs[scriptChunkId] : {command: '', start: '', end: '', output: ''};
+        logs[scriptChunkId] = log;
+        return log;
+    }
+
+    PubSub.subscribe(ExecutionStarted.topic, (_: any, event: ExecutionStarted) => {
+        const log = getLog(event.scriptChunkId);
+        log.command = manager.getScriptChunk(event.scriptChunkId).commandLine;
+        log.output = '';
+        log.start = event.startTime.toLocaleString();
+    });
+    PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
+        const log = getLog(event.scriptChunkId);
+        log.output = log.output + event.data;
+    });
+    PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
+        const log = getLog(event.scriptChunkId);
+        log.output = log.output + event.data;
+    });
+    PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
+        const log = getLog(event.scriptChunkId);
+        log.end = event.endTime.toLocaleString();
+        console.log(jsYaml.safeDump(logs));
+        fs.writeFileSync(logPath, jsYaml.safeDump(logs));
+    });
+    PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
+        const log = getLog(event.scriptChunkId);
+        log.output = log.output + event.cause.name + event.cause.message;
+    });
+    PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
+        const log = getLog(event.scriptChunkId);
+        log.output = log.output + event.output;
     });
 }

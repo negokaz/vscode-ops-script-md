@@ -66,6 +66,11 @@ window.addEventListener('load', () => {
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
                 break;
+            case 'log':
+                scriptChunk.classList.remove('ready', 'running', 'ran');
+                scriptChunk.classList.add('ran');
+                output.insertAdjacentText('beforeend', event.output);
+                break;
         }
         if (shouldScroll) {
             scrollToBottom(outputOuter);
