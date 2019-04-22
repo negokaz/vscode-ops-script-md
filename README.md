@@ -1,5 +1,7 @@
 # OpsScriptMD
 
+![](https://img.shields.io/visual-studio-marketplace/v/negokaz.opsscriptmd.svg)
+
 半自動化のためのドキュメンテーションツール
 
 ## モチベーション
@@ -19,7 +21,7 @@
 ## インストール
 
 1. [Visual Studio Code](https://code.visualstudio.com/) をインストール
-2. Visual Studio Code のマーケットプレイスから「OpsScriptMD」をインストール
+2. Visual Studio Code のマーケットプレイスから [OpsScriptMD](https://marketplace.visualstudio.com/items?itemName=negokaz.opsscriptmd) をインストール
 
 ## 使い方
 
