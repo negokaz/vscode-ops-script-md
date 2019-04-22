@@ -37,7 +37,7 @@ Markdown ドキュメントを開いた状態で `F1` キーを押下し、「Op
 
 スクリプトの領域にある再生ボタンをクリックするとスクリプトが実行されます。
 
-![](docs/images/script-chunk.png)
+![](docs/images/script-chunk.gif)
 
 ## ライセンス
 
