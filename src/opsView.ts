@@ -64,12 +64,12 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
             context.subscriptions
         );
         if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-            const rootPath = vscode.workspace.workspaceFolders[0].uri.path;
+            const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
             const logDir = path.join(rootPath, 'logs');
             if (!fs.existsSync(logDir)) {
                 fs.mkdirSync(logDir);
             }
-            const logFilename = path.basename(resource.uri.path, path.extname(resource.uri.path)) + '.log.yml';
+            const logFilename = path.basename(resource.uri.fsPath, path.extname(resource.uri.fsPath)) + '.log.yml';
             publishLog(manager, path.join(logDir, logFilename));
             subscribeToPersistEvents(manager, path.join(logDir, logFilename));
         }
