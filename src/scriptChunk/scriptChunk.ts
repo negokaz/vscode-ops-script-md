@@ -11,7 +11,8 @@ export default class ScriptChunk {
         if (maybeSettings && maybeSettings.length > 0 ) {
             const settings: any = RJSON.parse(maybeSettings[0]);
             if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1));
+                const stdin = settings.stdin ? true : false;
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin);
             }
         }
         return new InvalidScriptChunk();
@@ -23,12 +24,15 @@ export default class ScriptChunk {
     
     public readonly args: string[];
 
+    public readonly stdin: boolean;
+
     process: ChildProcess | undefined = undefined;
 
-    constructor(script: string, cmd: string, args: string[]) {
+    constructor(script: string, cmd: string, args: string[], stdin: boolean) {
         this.script = script;
         this.cmd = cmd;
         this.args = args;
+        this.stdin = stdin;
     }
 
     public get isRunnable(): boolean {
@@ -36,11 +40,19 @@ export default class ScriptChunk {
     }
 
     public get commandLine(): string {
-        return `${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
+        const header = this.stdin ? '[stdin] ' : '';
+        return `${header}${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
     }
 
     public spawnProcess(): ChildProcess {
-        const process = childProcess.spawn(this.cmd, this.args.concat(this.script));
+        let process = null;
+        if (this.stdin) {
+            process = childProcess.spawn(this.cmd, this.args);
+            process.stdin.write(this.script);
+            process.stdin.end();
+        } else {
+            process = childProcess.spawn(this.cmd, this.args.concat(this.script));
+        }
         process.on('close', () => {
             this.process = undefined;
         });
@@ -65,7 +77,7 @@ export default class ScriptChunk {
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', []);
+        super('', '', [], false);
     }
 
     public get isRunnable(): boolean {
