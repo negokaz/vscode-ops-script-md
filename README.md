@@ -1,6 +1,6 @@
 # OpsScriptMD
 
-![](https://img.shields.io/visual-studio-marketplace/v/negokaz.opsscriptmd.svg)
+[![](https://img.shields.io/visual-studio-marketplace/v/negokaz.opsscriptmd.svg)](https://marketplace.visualstudio.com/items?itemName=negokaz.opsscriptmd)
 
 半自動化のためのドキュメンテーションツール
 
