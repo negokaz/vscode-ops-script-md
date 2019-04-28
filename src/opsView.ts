@@ -96,6 +96,8 @@ function webviewContent(content: string, context: vscode.ExtensionContext): stri
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${resourceUri(context, 'css', 'icofont.min.css')}">
+    <link rel="stylesheet" href="${resourceUri(context, 'css', 'spinner.css')}">
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'markdown.css')}">
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'ops-view.css')}">
     <link rel="stylesheet" href="${resourceUri(context, 'css', 'highlight.css')}">

@@ -15,6 +15,14 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
                 <a class="script-chunk-trigger" title="run"></a>
                 ${defaultRender(tokens, index, options, env, self)}
                 <pre class="output"><code class="output-inner"></code></pre>
+                <div class="exit-status">
+                    <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
+                    <span class="code"></span>
+                </div>
             </div>
             `;
         } else {

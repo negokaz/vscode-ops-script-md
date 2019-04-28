@@ -4,8 +4,11 @@ window.addEventListener('load', () => {
 
     function executeScriptChunk(scriptChunkId, scriptChunkElement) {
         const output = scriptChunkElement.querySelector('.output-inner');
-        // reset output
+        const exitCode = scriptChunkElement.querySelector('.exit-status .code');
+        // reset outputs
         output.innerHTML = "";
+        exitCode.innerHTML = "";
+
         scriptChunkElement.classList.remove('ready', 'ran');
         scriptChunkElement.classList.add('running');
         vscode.postMessage({
@@ -62,6 +65,12 @@ window.addEventListener('load', () => {
             case 'complete':
                 scriptChunk.classList.remove('running', 'ran');
                 scriptChunk.classList.add('ran');
+                scriptChunk.querySelector('.exit-status .code').innerText = event.code;
+                if (event.code === 0) {
+                    scriptChunk.classList.add('success');
+                } else {
+                    scriptChunk.classList.add('failure');
+                }
                 break;
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
