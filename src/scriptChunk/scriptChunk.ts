@@ -3,6 +3,7 @@ import { Token } from 'markdown-it';
 import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';
+import * as process from 'process';
 
 export default class ScriptChunk {
 
@@ -47,11 +48,11 @@ export default class ScriptChunk {
     public spawnProcess(): ChildProcess {
         let process = null;
         if (this.stdin) {
-            process = childProcess.spawn(this.cmd, this.args);
+            process = childProcess.spawn(this.cmd, this.args, {detached: true});
             process.stdin.write(this.script);
             process.stdin.end();
         } else {
-            process = childProcess.spawn(this.cmd, this.args.concat(this.script));
+            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true});
         }
         process.on('close', () => {
             this.process = undefined;
@@ -62,12 +63,15 @@ export default class ScriptChunk {
 
     public killProcess() {
         if (this.process) {
+            this.process.unref();
             switch (os.platform()) {
                 case 'win32':
                     childProcess.spawn("taskkill", ["/pid", process.pid.toString(), '/t', '/f']);
                     return;
                 default:
-                    this.process.kill('SIGINT');
+                    // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                    // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                    process.kill(-this.process.pid, 'SIGINT');
                     return;
             }
         }
