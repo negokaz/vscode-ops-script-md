@@ -1,0 +1,41 @@
+/*
+ * https://tobiasahlin.com/spinkit/
+ */
+ .spinner {
+  --spinner-size: 0.5rem;
+
+  margin: 0 auto 0;
+  width: 2rem;
+  text-align: center;
+}
+
+.spinner > div {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  background-color: var(--opsscript-color-unknown);
+
+  border-radius: 100%;
+  display: inline-block;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% { 
+    transform: scale(0);
+  } 40% { 
+    transform: scale(1.0);
+  }
+}

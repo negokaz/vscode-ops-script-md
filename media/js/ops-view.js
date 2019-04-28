@@ -4,8 +4,11 @@ window.addEventListener('load', () => {
 
     function executeScriptChunk(scriptChunkId, scriptChunkElement) {
         const output = scriptChunkElement.querySelector('.output-inner');
-        // reset output
+        const exitCode = scriptChunkElement.querySelector('.exit-status .code');
+        // reset outputs
         output.innerHTML = "";
+        exitCode.innerHTML = "";
+
         scriptChunkElement.classList.remove('ready', 'ran');
         scriptChunkElement.classList.add('running');
         vscode.postMessage({
@@ -19,6 +22,16 @@ window.addEventListener('load', () => {
             command: 'killScriptChunk',
             scriptChunkId: scriptChunkId,
         });
+    }
+
+    function setExitCode(scriptChunkElement, code) {
+        scriptChunkElement.querySelector('.exit-status .code').innerText = (typeof code === 'number') ? code : '';
+        scriptChunkElement.classList.remove('success', 'failure');
+        if (code === 0) {
+            scriptChunkElement.classList.add('success');
+        } else {
+            scriptChunkElement.classList.add('failure');
+        }
     }
 
     function scrollTopMax(element) {
@@ -62,6 +75,7 @@ window.addEventListener('load', () => {
             case 'complete':
                 scriptChunk.classList.remove('running', 'ran');
                 scriptChunk.classList.add('ran');
+                setExitCode(scriptChunk, event.code);
                 break;
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
@@ -70,6 +84,7 @@ window.addEventListener('load', () => {
                 scriptChunk.classList.remove('ready', 'running', 'ran');
                 scriptChunk.classList.add('ran');
                 output.insertAdjacentText('beforeend', event.output);
+                setExitCode(scriptChunk, event.exitCode);
                 break;
         }
         if (shouldScroll) {
