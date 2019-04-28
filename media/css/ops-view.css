@@ -24,21 +24,13 @@
 
 .script-chunk-trigger {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.15rem;
+    right: 0.25rem;
 
+    font-family: 'IcoFont';
     cursor: pointer;
     user-select: none;
     color: var(--vscode-activityBar-inactiveForeground);
-
-    fill: currentColor;
-    vertical-align: middle;
-    overflow: hidden;
-    background-size: 1.5rem;
-    height: 1.5rem;
-    width: 1.5rem;
-    background-color: var(--vscode-activityBar-inactiveForeground);
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMTEuMzAzIDhsMTEuMzk0IDcuOTk3TDExLjMwMyAyNHoiLz48L3N2Zz4=');
 }
 
 .script-chunk-trigger:hover {
@@ -47,17 +39,19 @@
 }
 
 .script-chunk-trigger:active {
-    background-size: 1.7rem;
-    height: 1.7rem;
-    width: 1.7rem;
+    font-size: 120%;
 }
 
-.running.script-chunk .script-chunk-trigger {
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNOCA4aDE2djE2SDh6Ii8+PC9zdmc+');
+.ready.script-chunk .script-chunk-trigger::before {
+    content: '\ec74';
 }
 
-.ran.script-chunk .script-chunk-trigger {
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMjcuMSAxNC4zMTNWNS4zOTZMMjQuMTU4IDguMzRjLTIuMzMtMi4zMjUtNS4wMzMtMy41MDMtOC4xMS0zLjUwM0M5LjkwMiA0LjgzNyA0LjkwMSA5Ljg0NyA0Ljg5OSAxNmMuMDAxIDYuMTUyIDUuMDAzIDExLjE1OCAxMS4xNSAxMS4xNiA0LjI3NiAwIDkuMzY5LTIuMjI3IDEwLjgzNi04LjQ3OGwuMDI4LS4xMjJoLTMuMjNsLS4wMjIuMDY4Yy0xLjA3OCAzLjI0Mi00LjEzOCA1LjQyMS03LjYxMyA1LjQyMWE4IDggMCAwIDEtNS42OTEtMi4zNTlBNy45OTMgNy45OTMgMCAwIDEgOCAxNi4wMDFjMC00LjQzOCAzLjYxMS04LjA0OSA4LjA1LTguMDQ5IDIuMDY5IDAgMy42MzguNTggNS45MjQgMi41NzNsLTMuNzkyIDMuNzg5SDI3LjF6Ii8+PC9zdmc+');
+.running.script-chunk .script-chunk-trigger::before {
+    content: '\ec73';
+}
+
+.ran.script-chunk .script-chunk-trigger::before {
+    content: '\ec80';
 }
 
 .script-chunk .exit-status {
