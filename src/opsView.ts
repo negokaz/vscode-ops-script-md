@@ -131,7 +131,7 @@ function subscribeEvents(webview: vscode.Webview) {
         webview.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
     });
     PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
-        webview.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output });
+        webview.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output, exitCode: event.exitCode });
     });
 }
 
@@ -139,7 +139,7 @@ function publishLog(manager: ScriptChunkManager, logPath: string) {
     if (fs.existsSync(logPath)) {
         const logs: any = yaml.parse(fs.readFileSync(logPath, 'utf8'));
         for (let id in logs) {
-            PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output));
+            PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output, logs[id].exitCode));
         }
     }
 }

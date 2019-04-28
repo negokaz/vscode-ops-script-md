@@ -98,8 +98,11 @@ export class LogLoaded implements ProcessEvent {
 
     public readonly output: string;
 
-    constructor(scriptChunkId: string, output: string) {
+    public readonly exitCode: number;
+
+    constructor(scriptChunkId: string, output: string, exitCode: number) {
         this.scriptChunkId = scriptChunkId;
         this.output = output;
+        this.exitCode = exitCode;
     }
 }

@@ -24,6 +24,16 @@ window.addEventListener('load', () => {
         });
     }
 
+    function setExitCode(scriptChunkElement, code) {
+        scriptChunkElement.querySelector('.exit-status .code').innerText = (typeof code === 'number') ? code : '';
+        scriptChunkElement.classList.remove('success', 'failure');
+        if (code === 0) {
+            scriptChunkElement.classList.add('success');
+        } else {
+            scriptChunkElement.classList.add('failure');
+        }
+    }
+
     function scrollTopMax(element) {
         return element.scrollHeight - element.clientHeight;
     }
@@ -65,12 +75,7 @@ window.addEventListener('load', () => {
             case 'complete':
                 scriptChunk.classList.remove('running', 'ran');
                 scriptChunk.classList.add('ran');
-                scriptChunk.querySelector('.exit-status .code').innerText = event.code;
-                if (event.code === 0) {
-                    scriptChunk.classList.add('success');
-                } else {
-                    scriptChunk.classList.add('failure');
-                }
+                setExitCode(scriptChunk, event.code);
                 break;
             case 'error':
                 output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
@@ -79,6 +84,7 @@ window.addEventListener('load', () => {
                 scriptChunk.classList.remove('ready', 'running', 'ran');
                 scriptChunk.classList.add('ran');
                 output.insertAdjacentText('beforeend', event.output);
+                setExitCode(scriptChunk, event.exitCode);
                 break;
         }
         if (shouldScroll) {
