@@ -7,6 +7,9 @@ import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoade
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import * as jsYaml from 'js-yaml';
 import * as fs from 'fs';
+import Config from './config/config';
+
+const barbe = require('barbe');
 
 const resourceDirectoryName = 'media';
 
@@ -16,6 +19,11 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
         if (!vscode.window.activeTextEditor) {
             vscode.window.showErrorMessage("None active text editor.");
             return;
+        }
+
+        let workspace: vscode.Uri | null = null;
+        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+            workspace = vscode.workspace.workspaceFolders[0].uri;
         }
 
         const resource = vscode.window.activeTextEditor.document;
@@ -32,7 +40,14 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
         );
         subscribeEvents(panel.webview);
         const md = new MarkdownEngine();
-        const [content, manager] = md.render(resource.getText());
+        let resourceText: string = '';
+        if (workspace) {
+            const config = Config.load(workspace);
+            resourceText = barbe(resource.getText(), ['{{', '}}'], config.variables);
+        } else {
+            resourceText = resource.getText();
+        }
+        const [content, manager] = md.render(resourceText);
         panel.webview.html = webviewContent(content, context);
         panel.webview.onDidReceiveMessage(
             message => {

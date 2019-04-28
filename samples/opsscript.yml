@@ -1,0 +1,3 @@
+variables:
+  hosts:
+    web-server: 127.0.0.1
