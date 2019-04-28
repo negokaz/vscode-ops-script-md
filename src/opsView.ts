@@ -5,7 +5,7 @@ import MarkdownEngine from './markdown/markdownEngine';
 import * as PubSub from 'pubsub-js';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
-import * as jsYaml from 'js-yaml';
+import * as yaml from 'yaml';
 import * as fs from 'fs';
 import Config from './config/config';
 
@@ -135,7 +135,7 @@ function subscribeEvents(webview: vscode.Webview) {
 
 function publishLog(manager: ScriptChunkManager, logPath: string) {
     if (fs.existsSync(logPath)) {
-        const logs: any = jsYaml.safeLoad(fs.readFileSync(logPath, 'utf8'));
+        const logs: any = yaml.parse(fs.readFileSync(logPath, 'utf8'));
         for (let id in logs) {
             PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output));
         }
@@ -146,14 +146,16 @@ function subscribeToPersistEvents(manager: ScriptChunkManager, logPath: string) 
     const logs: any = {};
     
     function getLog(scriptChunkId: string) {
-        const log = logs[scriptChunkId] ? logs[scriptChunkId] : {command: '', start: '', end: '', output: ''};
+        const log = logs[scriptChunkId] ? logs[scriptChunkId] : {command: '', script: '', start: '', end: '', output: '', exitCode: ''};
         logs[scriptChunkId] = log;
         return log;
     }
 
     PubSub.subscribe(ExecutionStarted.topic, (_: any, event: ExecutionStarted) => {
         const log = getLog(event.scriptChunkId);
-        log.command = manager.getScriptChunk(event.scriptChunkId).commandLine;
+        const scriptChunk = manager.getScriptChunk(event.scriptChunkId);
+        log.command = scriptChunk.commandLine;
+        log.script = scriptChunk.script;
         log.output = '';
         log.start = event.startTime.toLocaleString();
     });
@@ -168,8 +170,8 @@ function subscribeToPersistEvents(manager: ScriptChunkManager, logPath: string) 
     PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
         const log = getLog(event.scriptChunkId);
         log.end = event.endTime.toLocaleString();
-        console.log(jsYaml.safeDump(logs));
-        fs.writeFileSync(logPath, jsYaml.safeDump(logs));
+        log.exitCode = event.exitCode;
+        fs.writeFileSync(logPath, yaml.stringify(logs));
     });
     PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
         const log = getLog(event.scriptChunkId);
