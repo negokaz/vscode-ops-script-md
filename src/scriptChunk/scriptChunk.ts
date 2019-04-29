@@ -3,7 +3,7 @@ import { Token } from 'markdown-it';
 import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';
-import * as process from 'process';
+import * as nodeProcess from 'process';
 
 export default class ScriptChunk {
 
@@ -66,12 +66,12 @@ export default class ScriptChunk {
             this.process.unref();
             switch (os.platform()) {
                 case 'win32':
-                    childProcess.spawn("taskkill", ["/pid", process.pid.toString(), '/t', '/f']);
+                    childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
                     return;
                 default:
                     // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
                     // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
-                    process.kill(-this.process.pid, 'SIGINT');
+                    nodeProcess.kill(-this.process.pid, 'SIGINT');
                     return;
             }
         }
