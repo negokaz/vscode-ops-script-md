@@ -50,4 +50,8 @@ export default class ScriptChunkManager {
             throw new Error(`Illegal scriptChunkId: ${scriptChunkId}`);
         }
     }
+
+    public hasScriptChunk(scriptChunkId: string): boolean {
+        return this.scriptChunks.has(scriptChunkId);
+    }
 }
