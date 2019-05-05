@@ -3,11 +3,12 @@ import * as path from 'path';
 import * as iconv from 'iconv-jschardet';
 import MarkdownEngine from './markdown/markdownEngine';
 import * as PubSub from 'pubsub-js';
-import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
+import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded as LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import Config from './config/config';
+import LogEntry from './log/LogEntry';
 
 const barbe = require('barbe');
 
@@ -139,17 +140,21 @@ function publishLog(manager: ScriptChunkManager, logPath: string) {
     if (fs.existsSync(logPath)) {
         const logs: any = yaml.parse(fs.readFileSync(logPath, 'utf8'));
         for (let id in logs) {
-            PubSub.publish(LogLoaded.topic, new LogLoaded(id, logs[id].output, logs[id].exitCode));
+            if (manager.hasScriptChunk(id)) {
+                const log = logs[id];
+                PubSub.publish(LogLoaded.topic, new LogLoaded(id, log.command, log.script, log.start, log.end, log.output, log.exitCode));
+            }
         }
     }
 }
 
 function subscribeToPersistEvents(manager: ScriptChunkManager, logPath: string) {
-    const logs: any = {};
+    const logs: Map<string, LogEntry> = new Map();
     
     function getLog(scriptChunkId: string) {
-        const log = logs[scriptChunkId] ? logs[scriptChunkId] : {command: '', script: '', start: '', end: '', output: '', exitCode: ''};
-        logs[scriptChunkId] = log;
+        const maybeLog: LogEntry | undefined = logs.get(scriptChunkId);
+        const log: LogEntry = maybeLog ? maybeLog : new LogEntry(scriptChunkId);
+        logs.set(scriptChunkId, log);
         return log;
     }
 
@@ -181,6 +186,11 @@ function subscribeToPersistEvents(manager: ScriptChunkManager, logPath: string) 
     });
     PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
         const log = getLog(event.scriptChunkId);
-        log.output = log.output + event.output;
+        log.command = event.command;
+        log.script = event.script;
+        log.start = event.start;
+        log.end = event.end;
+        log.output = event.output;
+        log.exitCode = event.exitCode;
     });
 }
