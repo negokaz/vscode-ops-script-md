@@ -3,6 +3,7 @@ import { Token } from 'markdown-it';
 import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';
+import * as nodeProcess from 'process';
 
 export default class ScriptChunk {
 
@@ -11,7 +12,8 @@ export default class ScriptChunk {
         if (maybeSettings && maybeSettings.length > 0 ) {
             const settings: any = RJSON.parse(maybeSettings[0]);
             if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1));
+                const stdin = settings.stdin ? true : false;
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin);
             }
         }
         return new InvalidScriptChunk();
@@ -23,12 +25,15 @@ export default class ScriptChunk {
     
     public readonly args: string[];
 
+    public readonly stdin: boolean;
+
     process: ChildProcess | undefined = undefined;
 
-    constructor(script: string, cmd: string, args: string[]) {
+    constructor(script: string, cmd: string, args: string[], stdin: boolean) {
         this.script = script;
         this.cmd = cmd;
         this.args = args;
+        this.stdin = stdin;
     }
 
     public get isRunnable(): boolean {
@@ -36,11 +41,19 @@ export default class ScriptChunk {
     }
 
     public get commandLine(): string {
-        return `${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
+        const header = this.stdin ? '[stdin] ' : '';
+        return `${header}${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
     }
 
     public spawnProcess(): ChildProcess {
-        const process = childProcess.spawn(this.cmd, this.args.concat(this.script));
+        let process = null;
+        if (this.stdin) {
+            process = childProcess.spawn(this.cmd, this.args, {detached: true});
+            process.stdin.write(this.script);
+            process.stdin.end();
+        } else {
+            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true});
+        }
         process.on('close', () => {
             this.process = undefined;
         });
@@ -52,10 +65,12 @@ export default class ScriptChunk {
         if (this.process) {
             switch (os.platform()) {
                 case 'win32':
-                    childProcess.spawn("taskkill", ["/pid", process.pid.toString(), '/t', '/f']);
+                    childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
                     return;
                 default:
-                    this.process.kill('SIGINT');
+                    // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                    // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                    nodeProcess.kill(-this.process.pid, 'SIGINT');
                     return;
             }
         }
@@ -65,7 +80,7 @@ export default class ScriptChunk {
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', []);
+        super('', '', [], false);
     }
 
     public get isRunnable(): boolean {
