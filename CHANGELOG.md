@@ -1,9 +1,17 @@
 # Change Log
 
-All notable changes to the "opsscriptmd" extension will be documented in this file.
+OpsScriptMD の注目すべき変更はこのファイルで文書化されます。
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+このファイルの書き方に関する推奨事項については、[Keep a Changelog](http://keepachangelog.com/) を確認してください。
 
-## [Unreleased]
+## [リリース予定]
 
-- Initial release
+### 機能追加
+- 標準入力からのスクリプトの読み込み
+
+## [0.1.1] - 2019-4-22
+
+- 初回リリース🚀
+
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.1.1

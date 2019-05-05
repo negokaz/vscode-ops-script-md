@@ -39,6 +39,10 @@ Markdown ドキュメントを開いた状態で `F1` キーを押下し、「Op
 
 ![](docs/images/script-chunk.gif)
 
+## 変更履歴
+
+[CHANGELOG.md](./CHANGELOG.md) を確認してください。
+
 ## ライセンス
 
 Copyright (c) 2019 Kazuki Negoro
