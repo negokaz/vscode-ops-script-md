@@ -28,6 +28,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
         }
 
         const resource = vscode.window.activeTextEditor.document;
+        const workingDir = vscode.Uri.file(path.dirname(resource.uri.fsPath));
 
         const panel = vscode.window.createWebviewPanel(
             'OpsView',
@@ -57,7 +58,7 @@ export default function openOpsView(context: vscode.ExtensionContext, viewColumn
                 switch (message.command) {
                     case 'executeScriptChunk':
                         PubSub.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
-                        const proc = scriptChunk.spawnProcess();
+                        const proc = scriptChunk.spawnProcess(workingDir);
                         proc.stdout.on('data', data => {
                             PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
                         });

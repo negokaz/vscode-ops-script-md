@@ -4,6 +4,7 @@ import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as nodeProcess from 'process';
+import { Uri } from 'vscode';
 
 export default class ScriptChunk {
 
@@ -45,14 +46,14 @@ export default class ScriptChunk {
         return `${header}${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
     }
 
-    public spawnProcess(): ChildProcess {
+    public spawnProcess(workingDir: Uri): ChildProcess {
         let process = null;
         if (this.stdin) {
-            process = childProcess.spawn(this.cmd, this.args, {detached: true});
+            process = childProcess.spawn(this.cmd, this.args, {detached: true, cwd: workingDir.fsPath});
             process.stdin.write(this.script);
             process.stdin.end();
         } else {
-            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true});
+            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true, cwd: workingDir.fsPath});
         }
         process.on('close', () => {
             this.process = undefined;
