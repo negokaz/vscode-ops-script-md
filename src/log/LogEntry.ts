@@ -1,7 +1,5 @@
 export default class LogEntry {
 
-    public readonly scriptChunkId: string;
-
     public command: string = '';
 
     public script: string = '';
@@ -13,8 +11,4 @@ export default class LogEntry {
     public output: string = '';
 
     public exitCode: number = 0;
-
-    constructor(scriptChunkId: string) {
-        this.scriptChunkId = scriptChunkId;
-    }
 }
