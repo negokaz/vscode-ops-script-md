@@ -63,7 +63,7 @@ export default class ScriptChunk {
     }
 
     public killProcess() {
-        if (this.process) {
+        if (this.process && !this.process.killed) {
             switch (os.platform()) {
                 case 'win32':
                     childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
