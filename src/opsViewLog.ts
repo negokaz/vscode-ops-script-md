@@ -54,7 +54,7 @@ export default class OpsViewLog {
 
     private getLog(scriptChunkId: string): LogEntry {
         const maybeLog: LogEntry | undefined = this.logs.get(scriptChunkId);
-        const log: LogEntry = maybeLog ? maybeLog : new LogEntry(scriptChunkId);
+        const log: LogEntry = maybeLog ? maybeLog : new LogEntry();
         this.logs.set(scriptChunkId, log);
         return log;
     }
