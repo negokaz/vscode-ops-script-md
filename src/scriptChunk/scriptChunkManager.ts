@@ -54,4 +54,10 @@ export default class ScriptChunkManager {
     public hasScriptChunk(scriptChunkId: string): boolean {
         return this.scriptChunks.has(scriptChunkId);
     }
+
+    public killAllRunningScriptChunk(): void {
+        for (let scriptChunkId of this.scriptChunks.keys()) {
+            this.getScriptChunk(scriptChunkId).killProcess();
+        }
+    }
 }
