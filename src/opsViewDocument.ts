@@ -7,6 +7,7 @@ import Config from './config/config';
 import MarkdownEngine from './markdown/markdownEngine';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
+import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 
 const barbe = require('barbe');
 
@@ -30,6 +31,8 @@ export default class OpsViewDocument {
 
     private readonly mdEngine = new MarkdownEngine();
 
+    private disposables: vscode.Disposable[] = [];
+
     get workingDirectory(): vscode.Uri {
         return vscode.Uri.file(path.dirname(this.document.uri.fsPath));
     }
@@ -47,9 +50,12 @@ export default class OpsViewDocument {
 
         const [content, manager] = this.mdEngine.render(this.getDocuemntText());
         this.panel.title = `OpsView: ${path.basename(this.document.uri.fsPath)}`;
+        this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);
-        this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions);
+        this.disposables.push(this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions));
         this.scriptChunkManager = manager;
+        this.disposables.push(vscode.workspace.onDidChangeTextDocument(e => this.notifyDocuemntChange(e), this.context.subscriptions));
+        this.disposables.push(this.panel.onDidChangeViewState(e => this.changeViewState(e), this.context.subscriptions));
     }
 
     private getDocuemntText(): string {
@@ -74,6 +80,10 @@ export default class OpsViewDocument {
         <script src="${this.resourceUri('js', 'ops-view.js')}"></script>
     </head>
     <body>
+        <div class="reload-notification"></div>
+        <div class="reload-notification hover">
+            <a class="reload-trigger" title="更新">ドキュメントが更新されました。クリックでリロード</a>
+        </div>
         ${content}
     </body>
     </html>
@@ -95,6 +105,9 @@ export default class OpsViewDocument {
                 return;
             case 'killScriptChunk':
                 this.killScriptChunk(message.scriptChunkId);
+                return;
+            case 'reloadDocument':
+                this.reloadDocument();
                 return;
         }
     }
@@ -122,7 +135,59 @@ export default class OpsViewDocument {
         scriptChunk.killProcess();
     }
 
+    private reloadDocument() {
+        PubSub.publish(TriggeredReload.topic, new TriggeredReload());
+    }
+
+    private readonly changeNotificationDelayMs = 300;
+
+    private changeNotificationTimer: NodeJS.Timeout | null = null;
+
+    private notifyDocuemntChange(e: vscode.TextDocumentChangeEvent) {
+        if (this.changeNotificationTimer) {
+            clearTimeout(this.changeNotificationTimer);
+        }
+        if (e.document.uri.fsPath === this.document.uri.fsPath) {
+            this.changeNotificationTimer = setTimeout(() => {
+                PubSub.publish(ChangedDocument.topic, new ChangedDocument());
+            }, this.changeNotificationDelayMs);
+        }
+    }
+
+    private stashedMessages: any[] = [];
+
+    private unstashMessages() {
+        // enqueue messages if it exist
+        if (this.stashedMessages.length > 0) {
+            this.stashedMessages.forEach(m => {
+                this.panel.webview.postMessage(m);
+            });
+            this.stashedMessages = [];
+        }
+    }
+
+    public postMessage(message: any) {
+        if (this.panel.active) {
+            this.unstashMessages();
+            this.panel.webview.postMessage(message).then(success => {
+                if (!success) {
+                    // retry postMessage when failed
+                    this.stashedMessages.push(message);
+                }
+            });
+        } else {
+            this.stashedMessages.push(message);
+        }
+    }
+
+    private changeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent) {
+        if (e.webviewPanel.active) {
+            this.unstashMessages();
+        }
+    }
+
     public dispose(): void {
+        this.disposables.forEach(d => d.dispose());
         this.scriptChunkManager.killAllRunningScriptChunk();
     }
 }

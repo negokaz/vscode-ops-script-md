@@ -46,6 +46,18 @@ window.addEventListener('load', () => {
         element.scrollTop = scrollTopMax(element);
     }
 
+    function updateScriptChunk(scriptChunkId, cb) {
+        const scriptChunk =
+            document.querySelector(`.script-chunk[data-script-chunk-id="${scriptChunkId}"]`);
+        const output = scriptChunk.querySelector('.output-inner');
+        const outputOuter = scriptChunk.querySelector('.output');
+        const shouldScroll = elementShouldScroll(outputOuter);
+        cb(scriptChunk, output);
+        if (shouldScroll) {
+            scrollToBottom(outputOuter);
+        }
+    }
+
     document.querySelectorAll('a.script-chunk-trigger').forEach(trigger => {
         const scriptChunk = trigger.closest('.script-chunk');
         const scriptChunkId = scriptChunk.dataset.scriptChunkId;
@@ -57,38 +69,50 @@ window.addEventListener('load', () => {
             }
         });
     });
+    document.querySelectorAll('a.reload-trigger').forEach(trigger => {
+        trigger.addEventListener('click', event => {
+            vscode.postMessage({ command: 'reloadDocument' });
+        });
+    });
     window.addEventListener('message', message => {
         const event = message.data;
-        const scriptChunkId = event.scriptChunkId;
-        const scriptChunk =
-            document.querySelector(`.script-chunk[data-script-chunk-id="${scriptChunkId}"]`);
-        const output = scriptChunk.querySelector('.output-inner');
-        const outputOuter = scriptChunk.querySelector('.output');
-        const shouldScroll = elementShouldScroll(outputOuter);
         switch (event.event) {
             case 'stdout':
-                output.insertAdjacentText('beforeend', event.data);
+                updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    output.insertAdjacentText('beforeend', event.data);
+                });
                 break;
             case 'stderr':
-                output.insertAdjacentText('beforeend', event.data);
+                updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    output.insertAdjacentText('beforeend', event.data);
+                });
                 break;
             case 'complete':
-                scriptChunk.classList.remove('running', 'ran');
-                scriptChunk.classList.add('ran');
-                setExitCode(scriptChunk, event.code);
+                updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    scriptChunk.classList.remove('running', 'ran');
+                    scriptChunk.classList.add('ran');
+                    setExitCode(scriptChunk, event.code);
+                });
                 break;
             case 'error':
-                output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
+                updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    appendLog(event.scriptChunkId, event.output, event.exitCode);
+                    output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
+                });
                 break;
             case 'log':
-                scriptChunk.classList.remove('ready', 'running', 'ran');
-                scriptChunk.classList.add('ran');
-                output.insertAdjacentText('beforeend', event.output);
-                setExitCode(scriptChunk, event.exitCode);
+                updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    scriptChunk.classList.remove('ready', 'running', 'ran');
+                    scriptChunk.classList.add('ran');
+                    output.insertAdjacentText('beforeend', event.output);
+                    setExitCode(scriptChunk, event.exitCode);
+                });
                 break;
-        }
-        if (shouldScroll) {
-            scrollToBottom(outputOuter);
+            case 'changedDocument':
+                document
+                    .querySelectorAll('.reload-notification')
+                    .forEach(e => e.classList.add('active'));
+                break;
         }
     });
 });
