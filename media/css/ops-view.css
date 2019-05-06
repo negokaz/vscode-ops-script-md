@@ -2,6 +2,48 @@
     --opsscript-color-unknown: #9e9e9e;
     --opsscript-color-success: #4caf50;
     --opsscript-color-failure: #f44336;
+
+    --opsscript-reload-notification-height: 1.5rem;
+}
+
+.reload-notification {
+    display: none;
+}
+
+.reload-notification.active {
+    display: inherit;
+    height: var(--opsscript-reload-notification-height);
+    width: 100%;
+
+    background-color: var(--vscode-activityBar-background);
+}
+
+.reload-notification.active.hover {
+    position: fixed;
+    top: 0;
+
+    z-index: 999;
+}
+
+.reload-trigger {
+    user-select: none;
+    cursor: pointer;
+    color: var(--vscode-activityBar-inactiveForeground);
+
+    margin-left: 0.5rem;
+}
+
+.reload-trigger:hover {
+    text-decoration: none;
+    color: var(--vscode-activityBar-foreground);
+}
+
+.reload-trigger::before {
+    font-family: 'IcoFont';
+    content: '\ec80';
+    color: var(--vscode-activityBarBadge-background);
+
+    margin-right: 0.2rem;
 }
 
 .script-chunk {
@@ -51,7 +93,7 @@
 }
 
 .ran.script-chunk .script-chunk-trigger::before {
-    content: '\ec80';
+    content: '\ec7f';
 }
 
 .script-chunk .exit-status {
