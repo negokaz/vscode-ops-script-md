@@ -55,6 +55,7 @@ export default class OpsViewDocument {
         this.disposables.push(this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions));
         this.scriptChunkManager = manager;
         this.disposables.push(vscode.workspace.onDidChangeTextDocument(e => this.notifyDocuemntChange(e), this.context.subscriptions));
+        this.disposables.push(this.panel.onDidChangeViewState(e => this.changeViewState(e), this.context.subscriptions));
     }
 
     private getDocuemntText(): string {
@@ -150,6 +151,38 @@ export default class OpsViewDocument {
             this.changeNotificationTimer = setTimeout(() => {
                 PubSub.publish(ChangedDocument.topic, new ChangedDocument());
             }, this.changeNotificationDelayMs);
+        }
+    }
+
+    private stashedMessages: any[] = [];
+
+    private unstashMessages() {
+        // enqueue messages if it exist
+        if (this.stashedMessages.length > 0) {
+            this.stashedMessages.forEach(m => {
+                this.panel.webview.postMessage(m);
+            });
+            this.stashedMessages = [];
+        }
+    }
+
+    public postMessage(message: any) {
+        if (this.panel.active) {
+            this.unstashMessages();
+            this.panel.webview.postMessage(message).then(success => {
+                if (!success) {
+                    // retry postMessage when failed
+                    this.stashedMessages.push(message);
+                }
+            });
+        } else {
+            this.stashedMessages.push(message);
+        }
+    }
+
+    private changeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent) {
+        if (e.webviewPanel.active) {
+            this.unstashMessages();
         }
     }
 

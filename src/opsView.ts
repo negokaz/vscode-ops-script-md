@@ -73,27 +73,38 @@ export default class OpsView {
     }
 
     private subscribeEvents() {
-        const webview = this.panel.webview;
         PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
-            webview.postMessage({ event: 'stdout', scriptChunkId: event.scriptChunkId, data: event.data });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'stdout', scriptChunkId: event.scriptChunkId, data: event.data });
+            }
         });
         PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
-            webview.postMessage({ event: 'stderr', scriptChunkId: event.scriptChunkId, data: event.data });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'stderr', scriptChunkId: event.scriptChunkId, data: event.data });
+            }
         });
         PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
-            webview.postMessage({ event: 'complete', scriptChunkId: event.scriptChunkId, code: event.exitCode });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'complete', scriptChunkId: event.scriptChunkId, code: event.exitCode });
+            }
         });
         PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
-            webview.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
+            }
         });
         PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
-            webview.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output, exitCode: event.exitCode });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output, exitCode: event.exitCode });
+            }
         });
         PubSub.subscribe(TriggeredReload.topic, (_: any, event: TriggeredReload) => {
             this.render();
         });
         PubSub.subscribe(ChangedDocument.topic, (_: any, event: ChangedDocument) => {
-            webview.postMessage({ event: 'changedDocument' });
+            if (this.opsViewDocument) {
+                this.opsViewDocument.postMessage({ event: 'changedDocument' });
+            }
         });
     }
 
