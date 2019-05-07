@@ -1,6 +1,6 @@
 # OpsScriptMD
 
-[![](https://img.shields.io/visual-studio-marketplace/v/negokaz.opsscriptmd.svg)](https://marketplace.visualstudio.com/items?itemName=negokaz.opsscriptmd)
+[![](https://img.shields.io/visual-studio-marketplace/v/negokaz.opsscriptmd.svg)](https://marketplace.visualstudio.com/items?itemName=negokaz.opsscriptmd) [![Build Status](https://travis-ci.org/negokaz/vscode-ops-script-md.svg?branch=master)](https://travis-ci.org/negokaz/vscode-ops-script-md)
 
 半自動化のためのドキュメンテーションツール
 
