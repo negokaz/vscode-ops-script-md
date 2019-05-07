@@ -10,7 +10,7 @@ export default class Config {
 
     static load(workspaceUri: vscode.Uri): Config {
         const configPath = path.join(workspaceUri.fsPath, 'opsscript.yml');
-        let config: any = null;
+        let config: any = {};
         if (fs.existsSync(configPath)) {
             config = yaml.parse(fs.readFileSync(configPath, 'utf8'));
         }
