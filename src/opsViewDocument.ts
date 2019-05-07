@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as PubSub from 'pubsub-js';
-import * as iconv from 'iconv-jschardet';
 
 import Config from './config/config';
 import MarkdownEngine from './markdown/markdownEngine';
@@ -9,6 +8,7 @@ import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoade
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 
+const iconv = require('iconv-jschardet');
 const barbe = require('barbe');
 
 export default class OpsViewDocument {
