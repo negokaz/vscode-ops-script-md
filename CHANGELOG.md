@@ -6,6 +6,10 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.2.1] - 2019-05-07
+
+ビルドエラーにより OpsView を開けなくなっていたため、再リリース
+
 ## [0.2.0] - 2019-05-06
 
 ### 機能追加
@@ -21,6 +25,7 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.2.0...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.1
 [0.2.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.0
 [0.1.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.1.1
