@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+- stable
+cache:
+  directories:
+  - node_modules
+script:
+- vsce package $TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: YAAfC41fT5owADS5mQSCK46KQDOlmDMpdcQO9WxDwM8n3Ro+IxUImYJXvcaFqogOYpKey1kGUgHT3hBeSEcexaDS1YcBTIU61Z8pHMI+uSUWz8jQiCrGjrVmxziWQtcqhEUFb5BCZbyV/XG0EWrSUQKW/AvktyLpzhbOhsrSor2yq7Nq9Pe9JbDfpPg6UxFlSXk0koiTAMjkZ2jazmP2OiElEVHBS0GoYHMlro2dG/7h1aZmxUMEKPdUtanUfp5dXTsjneVRdPNBDbpEnty4efkYvgq1gHZeakgdtGCZaYTu3/zeiyLPKGxU9OGpA6X6PoDT4bwIPwsvoSfnhWGwzUmKUSqUIxCUZnziz5BkgEVK6/Rlei70j7AeujMnaVi2MdL/o4J8KRuDrCNxlHiuJxgTa8YuHwShNXEMLioBf0fNjwBoq+09w8GGIXnOaLVDnX8j3zOG1qSekvIbEZS7vJOm/ee/jRiBTJOucGM0pLB+DQOktkY6TEUST4cP0oMf/EGSUbgCRMUZhLSUp39kVdp5g/B24waFwIaHaf573/7hlo8MD8v/7HFCYLCQCcacKQV9OurxyV9l5V+cP/hTk8K14fvDigV35ffXpZR+zWXE9UW2VdiCW9HCQhVtl1ymuSMdI6ny7bnrmIlr723JAOc+bWs26UVPLPUP5TmXshE=
+  skip_cleanup: true
+  file: "*.vsix"
+  on:
+    repo: negokaz/vscode-ops-script-md
+    tags: true
