@@ -1,6 +1,7 @@
 import * as MarkdownIt from 'markdown-it';
 import ExtendedMarkdownIt from './extendedMarkdownIt';
 import * as hljs from 'highlight.js';
+import markdownContainer from './markdownContainer';
 import markdownItScriptChunk from './markdownScriptChunk';
 import ScriptChunkManager from '../scriptChunk/scriptChunkManager';
 import * as vscode from 'vscode';
@@ -24,6 +25,7 @@ export default class MarkdownEngine {
                 return '';
             }
         }) as ExtendedMarkdownIt;
+        this.md.use(markdownContainer);
         this.md.use(markdownItScriptChunk);
     }
 

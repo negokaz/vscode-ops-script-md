@@ -1,0 +1,43 @@
+.alert {
+	margin: 7px 7px 0 5px;
+	padding: 1px 1rem 1px 1rem;
+	border-left-width: 5px;
+    border-left-style: solid;
+    background-color: var(--vscode-textBlockQuote-background);
+}
+
+.alert-info {
+    border-color: var(--vscode-inputValidation-infoBorder);
+}
+
+.alert-info::before {
+    content: 'Info';
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 120%;
+    color: var(--vscode-inputValidation-infoBorder);
+}
+
+.alert-warning {
+    border-color: var(--vscode-inputValidation-warningBorder);
+}
+
+.alert-warning::before {
+    content: 'Warning';
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 120%;
+    color: var(--vscode-inputValidation-warningBorder);
+}
+
+.alert-danger {
+    border-color: var(--vscode-inputValidation-errorBorder);
+}
+
+.alert-danger::before {
+    content: 'Danger';
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 120%;
+    color: var(--vscode-inputValidation-errorBorder);
+}

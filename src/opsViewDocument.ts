@@ -75,6 +75,7 @@ export default class OpsViewDocument {
         <link rel="stylesheet" href="${this.resourceUri('css', 'icofont.min.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'spinner.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'markdown.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('css', 'markdown-ext.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'ops-view.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'highlight.css')}">
         <script src="${this.resourceUri('js', 'ops-view.js')}"></script>
