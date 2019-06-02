@@ -3,6 +3,8 @@ import ExtendedMarkdownIt from './extendedMarkdownIt';
 import * as hljs from 'highlight.js';
 import markdownItScriptChunk from './markdownScriptChunk';
 import ScriptChunkManager from '../scriptChunk/scriptChunkManager';
+import * as vscode from 'vscode';
+import markdownVscResourceLink from './markdownVscResourceLink';
 
 export default class MarkdownEngine {
 
@@ -22,7 +24,8 @@ export default class MarkdownEngine {
         this.md.use(markdownItScriptChunk);
     }
 
-    public render(markdown: string): [string, ScriptChunkManager] {
+    public render(markdown: string, documentUri: vscode.Uri): [string, ScriptChunkManager] {
+        this.md.use(markdownVscResourceLink(documentUri));
         const tokens = this.md.parse(markdown, {});
         const manager = new ScriptChunkManager(tokens);
         const html = this.md.renderer.render(manager.tokens, this.md.options, {});
