@@ -7,6 +7,9 @@ import LogEntry from './log/LogEntry';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded as LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 
+const { strOptions } = require('yaml/types');
+strOptions.fold.lineWidth = Number.MAX_VALUE; // avoid to wrap logs
+
 export default class OpsViewLog {
 
     static active(context: vscode.ExtensionContext, scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri): OpsViewLog {
