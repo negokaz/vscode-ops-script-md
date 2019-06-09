@@ -9,6 +9,9 @@ import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 
 const iconv = require('iconv-jschardet');
+iconv.skipDecodeWarning(true);
+iconv.disableCodecDataWarn(true);
+
 const barbe = require('barbe');
 
 export default class OpsViewDocument {
