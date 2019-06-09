@@ -6,6 +6,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.3.0] - 2019-06-09
+
 ### 機能追加
 - OpsView に画像を表示できるように変更
 - OpsView に Info/Warning/Danger を表示できるように変更
@@ -37,7 +39,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.2.2...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.3.0
 [0.2.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.2
 [0.2.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.1
 [0.2.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.0
