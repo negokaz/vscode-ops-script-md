@@ -8,7 +8,7 @@ import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoade
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 
 const { strOptions } = require('yaml/types');
-strOptions.fold.lineWidth = 0;
+strOptions.fold.lineWidth = Number.MAX_VALUE; // avoid to wrap logs
 
 export default class OpsViewLog {
 
