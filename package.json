@@ -68,6 +68,7 @@
 	"dependencies": {
 		"@types/glob": "^7.1.1",
 		"barbe": "^3.0.15",
+		"debug": "^4.1.1",
 		"glob": "^7.1.3",
 		"highlight.js": "^9.15.6",
 		"iconv-jschardet": "^1.0.8",
