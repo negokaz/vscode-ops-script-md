@@ -23,7 +23,6 @@ export default class OpsView {
                 'OpsView: ',
                 viewColumn,
                 {
-                    localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, resourceDirectoryName))],
                     enableScripts: true,
                     retainContextWhenHidden: true,
                 }

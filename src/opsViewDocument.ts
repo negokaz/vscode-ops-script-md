@@ -48,7 +48,7 @@ export default class OpsViewDocument {
             this.workspace = null;
         }
 
-        const [content, manager] = this.mdEngine.render(this.getDocuemntText());
+        const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri);
         this.panel.title = `OpsView: ${path.basename(this.document.uri.fsPath)}`;
         this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);
@@ -75,6 +75,7 @@ export default class OpsViewDocument {
         <link rel="stylesheet" href="${this.resourceUri('css', 'icofont.min.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'spinner.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'markdown.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('css', 'markdown-ext.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'ops-view.css')}">
         <link rel="stylesheet" href="${this.resourceUri('css', 'highlight.css')}">
         <script src="${this.resourceUri('js', 'ops-view.js')}"></script>
