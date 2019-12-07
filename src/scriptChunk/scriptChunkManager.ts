@@ -1,5 +1,5 @@
 import * as uuidv4 from 'uuid/v4';
-import { Token } from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 import ScriptChunk from './scriptChunk';
 import * as crypto from 'crypto';
 

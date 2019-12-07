@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
 import * as path from 'path';
 

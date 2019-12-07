@@ -1,5 +1,5 @@
 import * as RJSON from 'relaxed-json';
-import { Token } from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';

@@ -1,4 +1,6 @@
-import { MarkdownIt, Token, Renderer } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
+import Token from 'markdown-it/lib/token';
+import Renderer from 'markdown-it/lib/renderer';
 import ScriptChunk from '../scriptChunk/scriptChunk';
 import ScriptChunkManger from '../scriptChunk/scriptChunkManager';
 

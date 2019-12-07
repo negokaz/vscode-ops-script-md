@@ -1,4 +1,4 @@
-import * as MarkdownIt from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 import ExtendedMarkdownIt from './extendedMarkdownIt';
 import * as hljs from 'highlight.js';
 import markdownContainer from './markdownContainer';
