@@ -175,7 +175,7 @@ export default class OpsViewDocument {
     }
 
     public postMessage(message: any) {
-        if (this.panel.active) {
+        if (this.panel.visible) {
             this.unstashMessages();
             this.panel.webview.postMessage(message).then(success => {
                 if (!success) {
