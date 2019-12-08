@@ -30,6 +30,8 @@ export default class ScriptChunk {
 
     process: ChildProcess | undefined = undefined;
 
+    triedToKillBySignal: boolean = false;
+
     constructor(script: string, cmd: string, args: string[], stdin: boolean) {
         this.script = script;
         this.cmd = cmd;
@@ -48,31 +50,49 @@ export default class ScriptChunk {
 
     public spawnProcess(workingDir: Uri): ChildProcess {
         let process = null;
+        let detachProcess = os.platform() !== 'win32';
         if (this.stdin) {
-            process = childProcess.spawn(this.cmd, this.args, {detached: true, cwd: workingDir.fsPath});
+            process = childProcess.spawn(this.cmd, this.args, {detached: detachProcess, cwd: workingDir.fsPath});
             process.stdin.write(this.script);
             process.stdin.end();
         } else {
-            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true, cwd: workingDir.fsPath});
+            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: detachProcess, cwd: workingDir.fsPath});
         }
         process.on('close', () => {
             this.process = undefined;
         });
         this.process = process;
+        this.triedToKillBySignal = false;
         return process;
     }
 
     public killProcess() {
-        if (this.process && !this.process.killed) {
-            switch (os.platform()) {
-                case 'win32':
-                    childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
-                    return;
-                default:
-                    // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
-                    // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
-                    nodeProcess.kill(-this.process.pid, 'SIGINT');
-                    return;
+        if (this.process) {
+            if (this.triedToKillBySignal) {
+                // force kill
+                switch (os.platform()) {
+                    case 'win32':
+                        childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
+                        return;
+                    default:
+                        // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                        // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                        nodeProcess.kill(-this.process.pid, 'SIGKILL');
+                        return;
+                }
+            } else {
+                // kill by signal
+                this.triedToKillBySignal = true;
+                switch (os.platform()) {
+                    case 'win32':
+                        childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
+                        return;
+                    default:
+                        // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                        // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                        nodeProcess.kill(-this.process.pid, 'SIGINT');
+                        return;
+                }
             }
         }
     }
