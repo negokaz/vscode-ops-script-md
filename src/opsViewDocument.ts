@@ -120,12 +120,16 @@ export default class OpsViewDocument {
         const scriptChunk = this.scriptChunkManager.getScriptChunk(scriptChunkId);
         PubSub.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         const proc = scriptChunk.spawnProcess(this.workingDirectory);
-        proc.stdout.on('data', data => {
-            PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
-        });
-        proc.stderr.on('data', data => {
-            PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
-        });
+        if (proc.stdout) {
+            proc.stdout.on('data', data => {
+                PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
+            });
+        }
+        if (proc.stderr) {
+            proc.stderr.on('data', data => {
+                PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
+            });
+        }
         proc.on('close', code => {
             PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code, new Date()));
         });
