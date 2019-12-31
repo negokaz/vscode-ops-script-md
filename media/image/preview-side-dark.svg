@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0beta2 (2b71d25, 2019-12-03)"
+   sodipodi:docname="preview-side-light.svg"
+   id="svg96"
+   version="1.1"
+   width="16"
+   height="16">
+  <defs
+     id="defs100" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg96"
+     inkscape:window-maximized="0"
+     inkscape:window-y="23"
+     inkscape:window-x="0"
+     inkscape:cy="8.7836821"
+     inkscape:cx="-1.800392"
+     inkscape:zoom="12.753316"
+     showguides="false"
+     showgrid="true"
+     id="namedview98"
+     inkscape:window-height="695"
+     inkscape:window-width="1170"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     inkscape:document-rotation="0"
+     bordercolor="#666666"
+     pagecolor="#ffffff">
+    <inkscape:grid
+       id="grid226"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata88">IcoFont Icons<rdf:RDF>
+  <cc:Work
+     rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title>ui-play</dc:title>
+  </cc:Work>
+</rdf:RDF>
+</metadata>
+  <title
+     id="title90">ui-play</title>
+  <glyph
+     id="glyph92"
+     horiz-adv-x="1000"
+     unicode=""
+     glyph-name="ui-play" />
+  <path
+     style="fill:#cccccc;stroke-width:0.00820107"
+     inkscape:connector-curvature="0"
+     id="path94"
+     d="m 8.990214,11 c 0,-0.974288 -0.06478,-1.954318 0.01722,-2.922044 0.09021,-1.06942 0.797965,-1.407305 1.69434,-0.800426 1.375322,0.933284 2.710458,1.930533 4.031651,2.940086 0.702843,0.53635 0.698743,1.175214 -0.01638,1.712384 -1.362194,1.023495 -2.727676,2.04535 -4.13416,3.006516 C 9.822646,15.456464 9.111613,15.111199 9.031241,14.164794 8.941848,13.116697 9.01072,12.055478 9.01072,11 Z" />
+  <path
+     sodipodi:nodetypes="cccccccccccccccccc"
+     style="fill:#cccccc"
+     id="path25"
+     fill="#C5C5C5"
+     d="m 13,1 1,1 V 8.371005 L 13,7.746212 V 2 H 8 V 12.8787 L 6.87837,14 H 2 L 1,13 V 2 L 2,1 Z M 2,2 H 7 V 13 H 2 Z"
+     clip-rule="evenodd"
+     fill-rule="evenodd"
+     inkscape:connector-curvature="0" />
+</svg>

@@ -27,7 +27,11 @@
 			},
 			{
 				"command": "opsScriptMD.openOpsViewToTheSide",
-				"title": "OpsScriptMD: Open OpsView to the Side"
+				"title": "OpsScriptMD: Open OpsView to the Side",
+				"icon": {
+					"light": "./media/image/preview-side-light.svg",
+					"dark": "./media/image/preview-side-dark.svg"
+				}
 			}
 		],
 		"menus": {
@@ -39,6 +43,27 @@
 				{
 					"command": "opsScriptMD.openOpsViewToTheSide",
 					"when": "editorLangId == markdown"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "opsScriptMD.openOpsView",
+					"when": "resourceLangId == markdown",
+					"group": "navigation"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "opsScriptMD.openOpsViewToTheSide",
+					"when": "editorLangId == markdown",
+					"group": "navigation"
+				}
+			],
+			"editor/title/context": [
+				{
+					"command": "opsScriptMD.openOpsViewToTheSide",
+					"when": "resourceLangId == markdown",
+					"group": "navigation"
 				}
 			]
 		}
