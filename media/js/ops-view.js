@@ -115,4 +115,15 @@ window.addEventListener('load', () => {
                 break;
         }
     });
+
+    document.querySelectorAll('a.copy-script-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const copyContent = 
+                trigger.parentElement.querySelector('textarea.read-only-script-chunk-content');
+            copyContent.select();
+            // trim tail line breaks
+            copyContent.setSelectionRange(0, copyContent.textContent.trim().length);
+            console.log(document.execCommand("copy"));
+        });
+    });
 });

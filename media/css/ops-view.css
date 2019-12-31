@@ -143,3 +143,36 @@
     color: var(--opsscript-color-failure);
     content: '\ec4f';
 }
+
+.read-only-script-chunk-content {
+    position: fixed;
+    left: -100%;
+}
+
+.read-only-script-chunk {
+    position:relative;
+}
+
+.copy-script-trigger {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.25rem;
+
+    font-family: 'IcoFont';
+    cursor: pointer;
+    user-select: none;
+    color: var(--vscode-activityBar-inactiveForeground);
+}
+
+.copy-script-trigger:hover {
+    text-decoration: none;
+    color: var(--vscode-activityBar-foreground);
+}
+
+.copy-script-trigger:active {
+    font-size: 120%;
+}
+
+.copy-script-trigger::before {
+    content: '\ec4c';
+}

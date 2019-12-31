@@ -28,7 +28,13 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
             </div>
             `;
         } else {
-            return defaultRender(tokens, index, options, env, self);
+            return `
+                <div class="read-only-script-chunk">
+                    <textarea class="read-only-script-chunk-content">${md.utils.escapeHtml(token.content)}</textarea>
+                    <a class="copy-script-trigger" title="copy to clipboard"></a>
+                    ${defaultRender(tokens, index, options, env, self)}
+                </div>
+            `;
         }
     };
 }
