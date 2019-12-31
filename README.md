@@ -29,11 +29,30 @@
 
 手順書のサンプルが [samples](samples) にあります。
 
-### 運用作業を実施
+### OpsView を開く
+
+いくつかの方法があります。
+
+#### Markdown ファイルのコンテキストメニューから開く
+
+Markdown を左クリックし、「OpsScriptMD: Open OpsView」を選択します。
+
+![](docs/images/open-opsview-explorer-context.png)
+
+
+#### Markdown ドキュメントのタイトルバーから開く
+
+Markdown ドキュメントを編集中にタブバーのアイコンをクリックします。
+
+![](docs/images/open-opsview-markdown-title.png)
+
+#### コマンドパレットから開く
 
 Markdown ドキュメントを開いた状態で `F1` キーを押下し、「OpsScriptMD: Open OpsView」を選択します。
 
 ![](docs/images/open-opsview.png)
+
+### OpsView から運用作業を実施
 
 スクリプトの領域にある再生ボタンをクリックするとスクリプトが実行されます。
 
