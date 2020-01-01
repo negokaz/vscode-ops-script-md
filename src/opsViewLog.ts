@@ -88,7 +88,7 @@ export default class OpsViewLog {
         });
         PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
             const log = this.getLog(event.scriptChunkId);
-            log.output = log.output + event.cause.name + event.cause.message;
+            log.output = log.output + event.cause.name + '\n' + event.cause.message;
         });
         PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
             const log = this.getLog(event.scriptChunkId);

@@ -96,7 +96,6 @@ window.addEventListener('load', () => {
                 break;
             case 'error':
                 updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
-                    appendLog(event.scriptChunkId, event.output, event.exitCode);
                     output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
                 });
                 break;
