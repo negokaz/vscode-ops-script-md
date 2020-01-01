@@ -14,8 +14,13 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
             return `
             <div class="ready script-chunk" ${ScriptChunkManger.SCRIPT_CHUNK_ID_ATTR_NAME}="${scriptChunkId}">
                 <span class="script-chunk-label">${chunk.commandLine}</span>
-                <a class="script-chunk-trigger" title="run"></a>
-                ${defaultRender(tokens, index, options, env, self)}
+                <div class="script-chunk-control-panel">
+                    <a class="script-chunk-trigger" title="run"></a>
+                    <a class="copy-script-trigger" title="copy to clipboard"></a>
+                </div>
+                <div class="script-chunk-code">
+                    ${defaultRender(tokens, index, options, env, self)}
+                </div>
                 <pre class="output"><code class="output-inner"></code></pre>
                 <div class="exit-status">
                     <div class="spinner">
@@ -30,9 +35,12 @@ export default function markdownItScriptChunk(md: MarkdownIt) {
         } else {
             return `
                 <div class="read-only-script-chunk">
-                    <textarea class="read-only-script-chunk-content">${md.utils.escapeHtml(token.content)}</textarea>
-                    <a class="copy-script-trigger" title="copy to clipboard"></a>
-                    ${defaultRender(tokens, index, options, env, self)}
+                    <div class="script-chunk-control-panel">
+                        <a class="copy-script-trigger" title="copy to clipboard"></a>
+                    </div>
+                    <div class="script-chunk-code">
+                        ${defaultRender(tokens, index, options, env, self)}
+                    </div>
                 </div>
             `;
         }

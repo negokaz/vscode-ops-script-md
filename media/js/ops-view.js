@@ -119,11 +119,18 @@ window.addEventListener('load', () => {
     document.querySelectorAll('a.copy-script-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const copyContent = 
-                trigger.parentElement.querySelector('textarea.read-only-script-chunk-content');
-            copyContent.select();
-            // trim tail line breaks
-            copyContent.setSelectionRange(0, copyContent.textContent.trim().length);
-            console.log(document.execCommand("copy"));
+                trigger
+                    .closest('.script-chunk,.read-only-script-chunk')
+                    .querySelector('.script-chunk-code');
+
+            const tmp = document.createElement('textarea');
+            tmp.style.position = 'fixed';
+            tmp.style.left = '-100%';
+            tmp.textContent = copyContent.textContent.trim();
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
         });
     });
 });

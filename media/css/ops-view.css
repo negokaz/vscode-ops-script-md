@@ -46,11 +46,11 @@
     margin-right: 0.2rem;
 }
 
-.script-chunk {
+.script-chunk, .read-only-script-chunk {
     position:relative;
 }
 
-.script-chunk > pre {
+.script-chunk .script-chunk-code pre {
     padding-top: 2rem;
 }
 
@@ -64,23 +64,29 @@
     padding: 0 0.5rem;
 }
 
-.script-chunk-trigger {
+.script-chunk-control-panel {
     position: absolute;
     top: 0.15rem;
     right: 0.25rem;
+}
 
+.script-chunk-control-panel a {
     font-family: 'IcoFont';
     cursor: pointer;
     user-select: none;
     color: var(--vscode-activityBar-inactiveForeground);
+
+    display: inline-block;
+    width: 1rem;
+    margin-right: 0.2rem;
 }
 
-.script-chunk-trigger:hover {
+.script-chunk-control-panel a:hover {
     text-decoration: none;
     color: var(--vscode-activityBar-foreground);
 }
 
-.script-chunk-trigger:active {
+.script-chunk-control-panel a:active {
     font-size: 120%;
 }
 
@@ -142,35 +148,6 @@
     font-family: 'IcoFont';
     color: var(--opsscript-color-failure);
     content: '\ec4f';
-}
-
-.read-only-script-chunk-content {
-    position: fixed;
-    left: -100%;
-}
-
-.read-only-script-chunk {
-    position:relative;
-}
-
-.copy-script-trigger {
-    position: absolute;
-    top: 0.15rem;
-    right: 0.25rem;
-
-    font-family: 'IcoFont';
-    cursor: pointer;
-    user-select: none;
-    color: var(--vscode-activityBar-inactiveForeground);
-}
-
-.copy-script-trigger:hover {
-    text-decoration: none;
-    color: var(--vscode-activityBar-foreground);
-}
-
-.copy-script-trigger:active {
-    font-size: 120%;
 }
 
 .copy-script-trigger::before {
