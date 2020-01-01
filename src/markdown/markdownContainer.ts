@@ -1,4 +1,5 @@
-import { MarkdownIt, Token } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 
 export default function markdownVscResourceLink(md: MarkdownIt) {
     md.use(require('markdown-it-container'), 'info',    { render: renderContainer });

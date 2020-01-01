@@ -96,7 +96,6 @@ window.addEventListener('load', () => {
                 break;
             case 'error':
                 updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
-                    appendLog(event.scriptChunkId, event.output, event.exitCode);
                     output.insertAdjacentText('beforeend', event.name + '\n' + event.message);
                 });
                 break;
@@ -114,5 +113,23 @@ window.addEventListener('load', () => {
                     .forEach(e => e.classList.add('active'));
                 break;
         }
+    });
+
+    document.querySelectorAll('a.copy-script-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const copyContent = 
+                trigger
+                    .closest('.script-chunk,.read-only-script-chunk')
+                    .querySelector('.script-chunk-code');
+
+            const tmp = document.createElement('textarea');
+            tmp.style.position = 'fixed';
+            tmp.style.left = '-100%';
+            tmp.textContent = copyContent.textContent.trim();
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+        });
     });
 });

@@ -13,11 +13,18 @@ const resourceDirectoryName = 'media';
 export default class OpsView {
 
     static open(context: vscode.ExtensionContext, viewColumn: vscode.ViewColumn) {
-        return () => {
-            if (!vscode.window.activeTextEditor) {
-                vscode.window.showErrorMessage("None active text editor.");
+        return async (uri?: vscode.Uri) => {
+
+            let document: vscode.TextDocument;
+            if (uri) {
+                document = await vscode.workspace.openTextDocument(uri);
+            } else if (vscode.window.activeTextEditor) {
+                document = vscode.window.activeTextEditor.document;
+            } else {
+                vscode.window.showErrorMessage("Could not resolve document URI.");
                 return;
             }
+
             const panel = vscode.window.createWebviewPanel(
                 'OpsView',
                 'OpsView: ',
@@ -27,7 +34,7 @@ export default class OpsView {
                     retainContextWhenHidden: true,
                 }
             );
-            const opsView = new OpsView(context, panel, vscode.window.activeTextEditor.document);
+            const opsView = new OpsView(context, panel, document);
             context.subscriptions.push(opsView);
 
             opsView.render();

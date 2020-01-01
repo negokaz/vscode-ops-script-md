@@ -1,5 +1,5 @@
-import * as MarkdownIt from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 
-export default interface ExtendedMarkdownIt extends MarkdownIt.MarkdownIt {
+export default interface ExtendedMarkdownIt extends MarkdownIt {
     options: MarkdownIt.Options;
 }

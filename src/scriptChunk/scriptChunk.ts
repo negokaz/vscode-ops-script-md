@@ -1,10 +1,11 @@
 import * as RJSON from 'relaxed-json';
-import { Token } from 'markdown-it';
+import Token from 'markdown-it/lib/token';
 import { ChildProcess } from 'child_process';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as nodeProcess from 'process';
 import { Uri } from 'vscode';
+import * as iconv from 'iconv-lite';
 
 export default class ScriptChunk {
 
@@ -14,11 +15,17 @@ export default class ScriptChunk {
             const settings: any = RJSON.parse(maybeSettings[0]);
             if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
                 const stdin = settings.stdin ? true : false;
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin);
+                const encoding =
+                    settings.encoding && iconv.encodingExists(settings.encoding) 
+                        ? settings.encoding 
+                        : ScriptChunk.defaultEncoding;
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin, encoding);
             }
         }
         return new InvalidScriptChunk();
     }
+
+    public static readonly defaultEncoding = 'utf-8';
 
     public readonly script: string;
 
@@ -28,13 +35,18 @@ export default class ScriptChunk {
 
     public readonly stdin: boolean;
 
+    public readonly encoding: string;
+
     process: ChildProcess | undefined = undefined;
 
-    constructor(script: string, cmd: string, args: string[], stdin: boolean) {
+    triedToKillBySignal: boolean = false;
+
+    constructor(script: string, cmd: string, args: string[], stdin: boolean, encoding: string) {
         this.script = script;
         this.cmd = cmd;
         this.args = args;
         this.stdin = stdin;
+        this.encoding = encoding;
     }
 
     public get isRunnable(): boolean {
@@ -48,40 +60,76 @@ export default class ScriptChunk {
 
     public spawnProcess(workingDir: Uri): ChildProcess {
         let process = null;
+        let detachProcess = os.platform() !== 'win32';
         if (this.stdin) {
-            process = childProcess.spawn(this.cmd, this.args, {detached: true, cwd: workingDir.fsPath});
-            process.stdin.write(this.script);
+            process = childProcess.spawn(
+                this.convertEncoding(this.cmd),
+                this.args.map(a => this.convertEncoding(a)),
+                {
+                    detached: detachProcess,
+                    cwd: workingDir.fsPath
+                }
+            );
+            process.stdin.write(this.convertEncoding(this.script));
             process.stdin.end();
         } else {
-            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: true, cwd: workingDir.fsPath});
+            process = childProcess.spawn(
+                this.convertEncoding(this.cmd),
+                this.args.concat(this.script).map(a => this.convertEncoding(a)),
+                {
+                    detached: detachProcess,
+                    cwd: workingDir.fsPath
+                }
+            );
         }
         process.on('close', () => {
             this.process = undefined;
         });
         this.process = process;
+        this.triedToKillBySignal = false;
         return process;
     }
 
     public killProcess() {
-        if (this.process && !this.process.killed) {
-            switch (os.platform()) {
-                case 'win32':
-                    childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
-                    return;
-                default:
-                    // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
-                    // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
-                    nodeProcess.kill(-this.process.pid, 'SIGINT');
-                    return;
+        if (this.process) {
+            if (this.triedToKillBySignal) {
+                // force kill
+                switch (os.platform()) {
+                    case 'win32':
+                        childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
+                        return;
+                    default:
+                        // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                        // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                        nodeProcess.kill(-this.process.pid, 'SIGKILL');
+                        return;
+                }
+            } else {
+                // kill by signal
+                this.triedToKillBySignal = true;
+                switch (os.platform()) {
+                    case 'win32':
+                        childProcess.spawn("taskkill", ["/pid", this.process.pid.toString(), '/t', '/f']);
+                        return;
+                    default:
+                        // > Please note `-` before pid. This converts a pid to a group of pids for process kill() method.
+                        // https://azimi.me/2014/12/31/kill-child_process-node-js.html#pid-range-hack
+                        nodeProcess.kill(-this.process.pid, 'SIGINT');
+                        return;
+                }
             }
         }
+    }
+
+    private convertEncoding(code: string): string {
+        return iconv.decode(iconv.encode(code, this.encoding), this.encoding);
     }
 }
 
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', [], false);
+        super('', '', [], false, ScriptChunk.defaultEncoding);
     }
 
     public get isRunnable(): boolean {
