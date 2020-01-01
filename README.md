@@ -58,6 +58,12 @@ Markdown ドキュメントを開いた状態で `F1` キーを押下し、「Op
 
 ![](docs/images/script-chunk.gif)
 
+クリップボードのボタンをクリックするとスクリプトがクリップボードにコピーされます。
+
+OpsView からうまくスクリプトを実行できないときに、他のツールでスクリプトを実行したい場合などに便利です。
+
+![](docs/images/copy-script-chunk.gif)
+
 ## 変更履歴
 
 [CHANGELOG.md](./CHANGELOG.md) を確認してください。
