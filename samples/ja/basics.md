@@ -6,7 +6,7 @@
 
 引数はプログラムのパスに続いて指定できます。
 
-```bash {cmd: ["/bin/bash", "-o", "errexit", "-c"]}
+```bash {cmd: ["/bin/bash", "-o", "errexit", "-c"], encoding: "utf-8"}
 ping 127.0.0.1
 ```
 

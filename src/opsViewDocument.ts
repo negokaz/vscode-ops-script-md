@@ -7,10 +7,7 @@ import MarkdownEngine from './markdown/markdownEngine';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
-
-const iconv = require('iconv-jschardet');
-iconv.skipDecodeWarning(true);
-iconv.disableCodecDataWarn(true);
+import * as iconv from 'iconv-lite';
 
 const barbe = require('barbe');
 
@@ -121,14 +118,18 @@ export default class OpsViewDocument {
         PubSub.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         const proc = scriptChunk.spawnProcess(this.workingDirectory);
         if (proc.stdout) {
-            proc.stdout.on('data', data => {
-                PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
-            });
+            proc.stdout
+                .pipe(iconv.decodeStream(scriptChunk.encoding))
+                .on('data', data => {
+                    PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, data));
+                });
         }
         if (proc.stderr) {
-            proc.stderr.on('data', data => {
-                PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, iconv.decode(data, iconv.detect(data).encoding).toString()));
-            });
+            proc.stderr
+                .pipe(iconv.decodeStream(scriptChunk.encoding))
+                .on('data', data => {
+                    PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, data));
+                });
         }
         proc.on('close', code => {
             PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code, new Date()));

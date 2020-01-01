@@ -5,6 +5,7 @@ import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as nodeProcess from 'process';
 import { Uri } from 'vscode';
+import * as iconv from 'iconv-lite';
 
 export default class ScriptChunk {
 
@@ -14,11 +15,17 @@ export default class ScriptChunk {
             const settings: any = RJSON.parse(maybeSettings[0]);
             if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
                 const stdin = settings.stdin ? true : false;
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin);
+                const encoding =
+                    settings.encoding && iconv.encodingExists(settings.encoding) 
+                        ? settings.encoding 
+                        : ScriptChunk.defaultEncoding;
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin, encoding);
             }
         }
         return new InvalidScriptChunk();
     }
+
+    public static readonly defaultEncoding = 'utf-8';
 
     public readonly script: string;
 
@@ -28,15 +35,18 @@ export default class ScriptChunk {
 
     public readonly stdin: boolean;
 
+    public readonly encoding: string;
+
     process: ChildProcess | undefined = undefined;
 
     triedToKillBySignal: boolean = false;
 
-    constructor(script: string, cmd: string, args: string[], stdin: boolean) {
+    constructor(script: string, cmd: string, args: string[], stdin: boolean, encoding: string) {
         this.script = script;
         this.cmd = cmd;
         this.args = args;
         this.stdin = stdin;
+        this.encoding = encoding;
     }
 
     public get isRunnable(): boolean {
@@ -52,11 +62,25 @@ export default class ScriptChunk {
         let process = null;
         let detachProcess = os.platform() !== 'win32';
         if (this.stdin) {
-            process = childProcess.spawn(this.cmd, this.args, {detached: detachProcess, cwd: workingDir.fsPath});
-            process.stdin.write(this.script);
+            process = childProcess.spawn(
+                this.convertEncoding(this.cmd),
+                this.args.map(a => this.convertEncoding(a)),
+                {
+                    detached: detachProcess,
+                    cwd: workingDir.fsPath
+                }
+            );
+            process.stdin.write(this.convertEncoding(this.script));
             process.stdin.end();
         } else {
-            process = childProcess.spawn(this.cmd, this.args.concat(this.script), {detached: detachProcess, cwd: workingDir.fsPath});
+            process = childProcess.spawn(
+                this.convertEncoding(this.cmd),
+                this.args.concat(this.script).map(a => this.convertEncoding(a)),
+                {
+                    detached: detachProcess,
+                    cwd: workingDir.fsPath
+                }
+            );
         }
         process.on('close', () => {
             this.process = undefined;
@@ -96,12 +120,16 @@ export default class ScriptChunk {
             }
         }
     }
+
+    private convertEncoding(code: string): string {
+        return iconv.decode(iconv.encode(code, this.encoding), this.encoding);
+    }
 }
 
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', [], false);
+        super('', '', [], false, ScriptChunk.defaultEncoding);
     }
 
     public get isRunnable(): boolean {
