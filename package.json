@@ -7,6 +7,7 @@
 	"engines": {
 		"vscode": "^1.32.0"
 	},
+	"icon": "docs/images/icon.png",
 	"categories": [
 		"Other"
 	],
@@ -14,6 +15,10 @@
 		"Markdown",
 		"Operations"
 	],
+    "galleryBanner": {
+        "color": "#00701a",
+        "theme": "dark"
+    },
 	"activationEvents": [
 		"onCommand:opsScriptMD.openOpsView",
 		"onCommand:opsScriptMD.openOpsViewToTheSide"
