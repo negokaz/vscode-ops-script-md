@@ -6,6 +6,12 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.4.1] - 2020-01-03
+
+※ ドキュメントのみ更新
+
+- アイコンを追加
+
 ## [0.4.0] - 2020-01-01
 
 ### 機能追加
@@ -48,7 +54,9 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.3.0...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.1
+[0.4.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.0
 [0.3.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.3.0
 [0.2.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.2
 [0.2.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.2.1
