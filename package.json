@@ -16,7 +16,7 @@
 		"Operations"
 	],
     "galleryBanner": {
-        "color": "#00701a",
+        "color": "#000000",
         "theme": "dark"
     },
 	"activationEvents": [
