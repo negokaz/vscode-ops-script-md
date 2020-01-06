@@ -6,6 +6,11 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.4.2] - 2020-01-06
+
+### 機能修正
+- スクリプトのボタンを押したときに他のボタンが揺れる問題を修正
+
 ## [0.4.1] - 2020-01-03
 
 ※ ドキュメントのみ更新
@@ -54,7 +59,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.4.1...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.2
 [0.4.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.1
 [0.4.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.0
 [0.3.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.3.0
