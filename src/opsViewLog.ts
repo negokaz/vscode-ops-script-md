@@ -1,24 +1,26 @@
 import * as vscode from 'vscode';
 import * as yaml from 'yaml';
 import * as fs from 'fs';
-import * as PubSub from 'pubsub-js';
 
 import LogEntry from './log/LogEntry';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded as LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
+import OpsViewEventBus from './opsViewEventBus';
 
 const { strOptions } = require('yaml/types');
 strOptions.fold.lineWidth = Number.MAX_VALUE; // avoid to wrap logs
 
 export default class OpsViewLog {
 
-    static active(context: vscode.ExtensionContext, scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri): OpsViewLog {
-        const opsViewLog = new OpsViewLog(scriptChunkManager, logPath);
+    static active(context: vscode.ExtensionContext, eventBus: OpsViewEventBus ,scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri): OpsViewLog {
+        const opsViewLog = new OpsViewLog(eventBus, scriptChunkManager, logPath);
         opsViewLog.subscribeEvents();
         opsViewLog.publishLog();
         context.subscriptions.push(opsViewLog);
         return opsViewLog;
     }
+
+    private readonly eventBus: OpsViewEventBus;
 
     private readonly scriptChunkManager: ScriptChunkManager;
 
@@ -26,7 +28,8 @@ export default class OpsViewLog {
 
     private readonly logs: Map<string, LogEntry> = new Map();
 
-    private constructor(scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri) {
+    private constructor(eventBus: OpsViewEventBus, scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri) {
+        this.eventBus = eventBus;
         this.scriptChunkManager = scriptChunkManager;
         this.logPath = logPath;
     }
@@ -49,7 +52,7 @@ export default class OpsViewLog {
             for (let id in logs) {
                 if (this.scriptChunkManager.hasScriptChunk(id)) {
                     const log = logs[id];
-                    PubSub.publish(LogLoaded.topic, new LogLoaded(id, log.command, log.script, log.start, log.end, log.output, log.exitCode));
+                    this.eventBus.publish(LogLoaded.topic, new LogLoaded(id, log.command, log.script, log.start, log.end, log.output, log.exitCode));
                 }
             }
         }
@@ -64,7 +67,7 @@ export default class OpsViewLog {
 
     private subscribeEvents() {
     
-        PubSub.subscribe(ExecutionStarted.topic, (_: any, event: ExecutionStarted) => {
+        this.eventBus.subscribe(ExecutionStarted.topic, (event: ExecutionStarted) => {
             const log = this.getLog(event.scriptChunkId);
             const scriptChunk = this.scriptChunkManager.getScriptChunk(event.scriptChunkId);
             log.command = scriptChunk.commandLine;
@@ -72,25 +75,25 @@ export default class OpsViewLog {
             log.output = '';
             log.start = event.startTime.toLocaleString();
         });
-        PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
+        this.eventBus.subscribe(StdoutProduced.topic, (event: StdoutProduced) => {
             const log = this.getLog(event.scriptChunkId);
             log.output = log.output + event.data;
         });
-        PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
+        this.eventBus.subscribe(StderrProduced.topic, (event: StderrProduced) => {
             const log = this.getLog(event.scriptChunkId);
             log.output = log.output + event.data;
         });
-        PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
+        this.eventBus.subscribe(ProcessCompleted.topic, (event: ProcessCompleted) => {
             const log = this.getLog(event.scriptChunkId);
             log.end = event.endTime.toLocaleString();
             log.exitCode = event.exitCode;
             this.writeLog();
         });
-        PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
+        this.eventBus.subscribe(SpawnFailed.topic, (event: SpawnFailed) => {
             const log = this.getLog(event.scriptChunkId);
             log.output = log.output + event.cause.name + '\n' + event.cause.message;
         });
-        PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
+        this.eventBus.subscribe(LogLoaded.topic, (event: LogLoaded) => {
             const log = this.getLog(event.scriptChunkId);
             log.command = event.command;
             log.script = event.script;

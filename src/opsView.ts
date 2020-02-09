@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as PubSub from 'pubsub-js';
 import * as fs from 'fs';
+import uuidv4 from 'uuid/v4';
 
 import OpsViewDocument from './opsViewDocument';
 import OpsViewLog from './opsViewLog';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
+import OpsViewEventBus from './opsViewEventBus';
 
 const resourceDirectoryName = 'media';
 
@@ -24,7 +25,7 @@ export default class OpsView {
                 vscode.window.showErrorMessage("Could not resolve document URI.");
                 return;
             }
-
+            const viewId = uuidv4();
             const panel = vscode.window.createWebviewPanel(
                 'OpsView',
                 'OpsView: ',
@@ -34,7 +35,7 @@ export default class OpsView {
                     retainContextWhenHidden: true,
                 }
             );
-            const opsView = new OpsView(context, panel, document);
+            const opsView = new OpsView(context, viewId, panel, document);
             context.subscriptions.push(opsView);
 
             opsView.render();
@@ -42,6 +43,8 @@ export default class OpsView {
     }
 
     private readonly context: vscode.ExtensionContext;
+
+    private readonly eventBus: OpsViewEventBus;
 
     private readonly panel: vscode.WebviewPanel;
 
@@ -51,14 +54,15 @@ export default class OpsView {
 
     private opsViewLog: OpsViewLog | null = null;
 
-    private constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, document: vscode.TextDocument) {
+    private constructor(context: vscode.ExtensionContext, viewId: string, panel: vscode.WebviewPanel, document: vscode.TextDocument) {
         this.context = context;
+        this.eventBus = OpsViewEventBus.for(viewId);
         this.panel = panel;
         this.document = document;
     }
 
     public render() {
-        PubSub.clearAllSubscriptions();
+        this.eventBus.unsbscribeAll();
         if (this.opsViewDocument) {
             this.opsViewDocument.dispose();
         }
@@ -72,42 +76,42 @@ export default class OpsView {
         const logFilename = path.basename(this.document.uri.fsPath, path.extname(this.document.uri.fsPath)) + '.log.yml';
         const logPath = vscode.Uri.file(path.join(logDir.fsPath, logFilename));
         
-        const docuemnt = OpsViewDocument.render(this.context, this.document, this.panel);
+        const docuemnt = OpsViewDocument.render(this.context, this.eventBus, this.document, this.panel);
 
         this.opsViewDocument = docuemnt;
-        this.opsViewLog = OpsViewLog.active(this.context, docuemnt.scriptChunkManager, logPath);
+        this.opsViewLog = OpsViewLog.active(this.context, this.eventBus, docuemnt.scriptChunkManager, logPath);
     }
 
     private subscribeEvents() {
-        PubSub.subscribe(StdoutProduced.topic, (_: any, event: StdoutProduced) => {
+        this.eventBus.subscribe(StdoutProduced.topic, (event: StdoutProduced) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'stdout', scriptChunkId: event.scriptChunkId, data: event.data });
             }
         });
-        PubSub.subscribe(StderrProduced.topic, (_: any, event: StderrProduced) => {
+        this.eventBus.subscribe(StderrProduced.topic, (event: StderrProduced) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'stderr', scriptChunkId: event.scriptChunkId, data: event.data });
             }
         });
-        PubSub.subscribe(ProcessCompleted.topic, (_: any, event: ProcessCompleted) => {
+        this.eventBus.subscribe(ProcessCompleted.topic, (event: ProcessCompleted) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'complete', scriptChunkId: event.scriptChunkId, code: event.exitCode });
             }
         });
-        PubSub.subscribe(SpawnFailed.topic, (_: any, event: SpawnFailed) => {
+        this.eventBus.subscribe(SpawnFailed.topic, (event: SpawnFailed) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'error', scriptChunkId: event.scriptChunkId, name: event.cause.name, message: event.cause.message });
             }
         });
-        PubSub.subscribe(LogLoaded.topic, (_: any, event: LogLoaded) => {
+        this.eventBus.subscribe(LogLoaded.topic, (event: LogLoaded) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'log', scriptChunkId: event.scriptChunkId, output: event.output, exitCode: event.exitCode });
             }
         });
-        PubSub.subscribe(TriggeredReload.topic, (_: any, event: TriggeredReload) => {
+        this.eventBus.subscribe(TriggeredReload.topic, (event: TriggeredReload) => {
             this.render();
         });
-        PubSub.subscribe(ChangedDocument.topic, (_: any, event: ChangedDocument) => {
+        this.eventBus.subscribe(ChangedDocument.topic, (event: ChangedDocument) => {
             if (this.opsViewDocument) {
                 this.opsViewDocument.postMessage({ event: 'changedDocument' });
             }
@@ -129,6 +133,6 @@ export default class OpsView {
     }
 
     public dispose(): void {
-        PubSub.clearAllSubscriptions();
+        this.eventBus.unsbscribeAll();
     }
 }
