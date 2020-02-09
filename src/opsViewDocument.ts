@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as PubSub from 'pubsub-js';
 
 import Config from './config/config';
 import MarkdownEngine from './markdown/markdownEngine';
@@ -8,13 +7,14 @@ import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoade
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 import * as iconv from 'iconv-lite';
+import OpsViewEventBus from './opsViewEventBus';
 
 const barbe = require('barbe');
 
 export default class OpsViewDocument {
 
-    static render(context: vscode.ExtensionContext, document: vscode.TextDocument, panel: vscode.WebviewPanel): OpsViewDocument {
-        const opsViewDocument = new OpsViewDocument(context, document, panel);
+    static render(context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): OpsViewDocument {
+        const opsViewDocument = new OpsViewDocument(context, eventBus, document, panel);
         context.subscriptions.push(opsViewDocument);
         return opsViewDocument;
     }
@@ -27,6 +27,8 @@ export default class OpsViewDocument {
 
     private readonly context: vscode.ExtensionContext;
 
+    private readonly eventBus: OpsViewEventBus;
+
     private readonly workspace: vscode.WorkspaceFolder | null;
 
     private readonly mdEngine = new MarkdownEngine();
@@ -37,8 +39,9 @@ export default class OpsViewDocument {
         return vscode.Uri.file(path.dirname(this.document.uri.fsPath));
     }
 
-    private constructor (context: vscode.ExtensionContext, document: vscode.TextDocument, panel: vscode.WebviewPanel) {
+    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel) {
         this.context = context;
+        this.eventBus = eventBus;
         this.panel = panel;
         this.document = document;
 
@@ -115,32 +118,32 @@ export default class OpsViewDocument {
 
     private executeScriptChunk(scriptChunkId: string) {
         const scriptChunk = this.scriptChunkManager.getScriptChunk(scriptChunkId);
-        PubSub.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
+        this.eventBus.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         try {
             const proc = scriptChunk.spawnProcess(this.workingDirectory);
             if (proc.stdout) {
                 proc.stdout
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
                     .on('data', data => {
-                        PubSub.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, data));
+                        this.eventBus.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, data));
                     });
             }
             if (proc.stderr) {
                 proc.stderr
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
                     .on('data', data => {
-                        PubSub.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, data));
+                        this.eventBus.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, data));
                     });
             }
             proc.on('close', code => {
-                PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code, new Date()));
+                this.eventBus.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, code, new Date()));
             });
             proc.on('error', err => {
-                PubSub.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
+                this.eventBus.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
             });
         } catch (err) {
-            PubSub.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
-            PubSub.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, -1, new Date()));
+            this.eventBus.publish(SpawnFailed.topic, new SpawnFailed(scriptChunkId, err));
+            this.eventBus.publish(ProcessCompleted.topic, new ProcessCompleted(scriptChunkId, -1, new Date()));
         }
     }
 
@@ -150,7 +153,7 @@ export default class OpsViewDocument {
     }
 
     private reloadDocument() {
-        PubSub.publish(TriggeredReload.topic, new TriggeredReload());
+        this.eventBus.publish(TriggeredReload.topic, new TriggeredReload());
     }
 
     private readonly changeNotificationDelayMs = 300;
@@ -163,7 +166,7 @@ export default class OpsViewDocument {
         }
         if (e.document.uri.fsPath === this.document.uri.fsPath) {
             this.changeNotificationTimer = setTimeout(() => {
-                PubSub.publish(ChangedDocument.topic, new ChangedDocument());
+                this.eventBus.publish(ChangedDocument.topic, new ChangedDocument());
             }, this.changeNotificationDelayMs);
         }
     }
