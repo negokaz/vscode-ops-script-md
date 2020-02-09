@@ -25,13 +25,15 @@ export default class OpsViewDocument {
 
     readonly scriptChunkManager: ScriptChunkManager;
 
+    readonly config: Config;
+
     private readonly context: vscode.ExtensionContext;
 
     private readonly eventBus: OpsViewEventBus;
 
     private readonly workspace: vscode.WorkspaceFolder | null;
 
-    private readonly mdEngine = new MarkdownEngine();
+    private readonly mdEngine: MarkdownEngine;
 
     private disposables: vscode.Disposable[] = [];
 
@@ -51,7 +53,15 @@ export default class OpsViewDocument {
             this.workspace = null;
         }
 
-        const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri);
+        if (this.workspace) {
+            this.config = Config.load(this.workspace.uri);
+        } else {
+            this.config = Config.default();
+        }
+
+        this.mdEngine = new MarkdownEngine(this.config);
+
+        const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri, this.config);
         this.panel.title = `OpsView: ${path.basename(this.document.uri.fsPath)}`;
         this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);

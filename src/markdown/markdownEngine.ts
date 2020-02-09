@@ -6,12 +6,16 @@ import markdownItScriptChunk from './markdownScriptChunk';
 import ScriptChunkManager from '../scriptChunk/scriptChunkManager';
 import * as vscode from 'vscode';
 import markdownVscResourceLink from './markdownVscResourceLink';
+import Config from '../config/config';
 
 export default class MarkdownEngine {
 
+    config: Config;
+
     md: ExtendedMarkdownIt;
 
-    constructor() {
+    constructor(config: Config) {
+        this.config = config;
         this.md = new MarkdownIt({
             html:         true,        // Enable HTML tags in source
             breaks:       true,        // Convert '\n' in paragraphs into <br>
@@ -26,13 +30,13 @@ export default class MarkdownEngine {
             }
         }) as ExtendedMarkdownIt;
         this.md.use(markdownContainer);
-        this.md.use(markdownItScriptChunk);
+        this.md.use(markdownItScriptChunk(this.config));
     }
 
-    public render(markdown: string, documentUri: vscode.Uri): [string, ScriptChunkManager] {
+    public render(markdown: string, documentUri: vscode.Uri, config: Config): [string, ScriptChunkManager] {
         this.md.use(markdownVscResourceLink(documentUri));
         const tokens = this.md.parse(markdown, {});
-        const manager = new ScriptChunkManager(tokens);
+        const manager = new ScriptChunkManager(tokens, config);
         const html = this.md.renderer.render(manager.tokens, this.md.options, {});
         return [html, manager];
     }
