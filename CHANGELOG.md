@@ -6,6 +6,14 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.5.0] - 2020-02-11
+
+### 機能追加
+- `opsscript.yml` ファイルで環境変数を設定できるように変更
+
+### 機能修正
+- `opsscript.yml` ファイルの変更でもリロードをサジェストするよう変更
+
 ## [0.4.2] - 2020-01-06
 
 ### 機能修正
@@ -59,7 +67,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.4.2...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.5.0
 [0.4.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.2
 [0.4.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.1
 [0.4.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.0
