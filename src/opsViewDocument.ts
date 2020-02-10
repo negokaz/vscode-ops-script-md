@@ -13,16 +13,8 @@ const barbe = require('barbe');
 
 export default class OpsViewDocument {
 
-    static async render(context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<OpsViewDocument> {
-
-        let opsViewDocument: OpsViewDocument;
-        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-            const workspace = vscode.workspace.workspaceFolders[0];
-            const [config, configDocs] = await Config.load(workspace.uri);
-            opsViewDocument = new OpsViewDocument(context, eventBus, document, config, configDocs, panel);
-        } else {
-            opsViewDocument = new OpsViewDocument(context, eventBus, document, Config.default(), [], panel);
-        }
+    static async render(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<OpsViewDocument> {
+        let opsViewDocument: OpsViewDocument = new OpsViewDocument(context, eventBus, document, config, panel);
         context.subscriptions.push(opsViewDocument);
         return opsViewDocument;
     }
@@ -35,8 +27,6 @@ export default class OpsViewDocument {
 
     readonly config: Config;
 
-    readonly configDocuments: vscode.TextDocument[];
-
     private readonly context: vscode.ExtensionContext;
 
     private readonly eventBus: OpsViewEventBus;
@@ -45,23 +35,17 @@ export default class OpsViewDocument {
 
     private disposables: vscode.Disposable[] = [];
 
-    get workingDirectory(): vscode.Uri {
-        return vscode.Uri.file(path.dirname(this.document.uri.fsPath));
-    }
-
-    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, config: Config, configDocuments: vscode.TextDocument[], panel: vscode.WebviewPanel) {
+    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, config: Config, panel: vscode.WebviewPanel) {
         this.context = context;
         this.eventBus = eventBus;
         this.panel = panel;
         this.document = document;
         this.config = config;
-        this.configDocuments = configDocuments;
 
         this.mdEngine = new MarkdownEngine(this.config);
 
         const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri, this.config);
         this.scriptChunkManager = manager;
-        this.panel.title = `OpsView: ${path.basename(this.document.uri.fsPath)}`;
         this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);
         this.disposables.push(this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions));
@@ -123,7 +107,7 @@ export default class OpsViewDocument {
         const scriptChunk = this.scriptChunkManager.getScriptChunk(scriptChunkId);
         this.eventBus.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         try {
-            const proc = scriptChunk.spawnProcess(this.workingDirectory);
+            const proc = scriptChunk.spawnProcess(this.config.baseDirectory);
             if (proc.stdout) {
                 proc.stdout
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
@@ -169,7 +153,7 @@ export default class OpsViewDocument {
         }
         const changedPath = e.document.uri.fsPath;
         if (changedPath === this.document.uri.fsPath 
-            || this.configDocuments.filter(d => changedPath === d.uri.fsPath).length > 0) {
+            || this.config.configDocuments.filter(d => changedPath === d.uri.fsPath).length > 0) {
             
             this.changeNotificationTimer = setTimeout(() => {
                 this.eventBus.publish(ChangedDocument.topic, new ChangedDocument());
