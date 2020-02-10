@@ -2,6 +2,7 @@ import * as uuidv4 from 'uuid/v4';
 import Token from 'markdown-it/lib/token';
 import ScriptChunk from './scriptChunk';
 import * as crypto from 'crypto';
+import Config from '../config/config';
 
 export default class ScriptChunkManager {
 
@@ -11,14 +12,14 @@ export default class ScriptChunkManager {
     
     scriptChunks: Map<string, ScriptChunk> = new Map();
 
-    constructor(tokens: Token[]) {
-        this.tokens = this.assignScriptChunkIds(tokens);
+    constructor(tokens: Token[], config: Config) {
+        this.tokens = this.assignScriptChunkIds(tokens, config);
     }
 
-    assignScriptChunkIds(tokens: Token[]): Token[] {
+    assignScriptChunkIds(tokens: Token[], config: Config): Token[] {
         return tokens.map(token => {
             if (token.type === 'fence') {
-                const chunk = ScriptChunk.parse(token);
+                const chunk = ScriptChunk.parse(token, config);
                 if (chunk.isRunnable) {
                     const scriptChunkId = this.generateScriptChunkId(chunk);
                     token.attrSet(ScriptChunkManager.SCRIPT_CHUNK_ID_ATTR_NAME, scriptChunkId);

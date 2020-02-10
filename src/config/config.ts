@@ -8,6 +8,10 @@ const objectAssignDeep = require(`object-assign-deep`);
 
 export default class Config {
 
+    static default(): Config {
+        return Config.resolve({});
+    }
+
     static load(workspaceUri: vscode.Uri): Config {
         const configPath = path.join(workspaceUri.fsPath, 'opsscript.yml');
         let config: any = {};
@@ -25,12 +29,18 @@ export default class Config {
     }
 
     static resolve(config: any): Config {
-        return new Config(config.variables ? config.variables : {});
+        return new Config(
+            config.environment ? objectAssignDeep(config.environment, process.env) : process.env,
+            config.variables ? config.variables : {}
+        );
     }
+
+    public readonly env: any;
 
     public readonly variables: any;
 
-    constructor(variables: any) {
+    constructor(env: any, variables: any) {
+        this.env = env;
         this.variables = variables;
     }
 }

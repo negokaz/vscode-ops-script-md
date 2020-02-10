@@ -6,10 +6,11 @@ import * as os from 'os';
 import * as nodeProcess from 'process';
 import { Uri } from 'vscode';
 import * as iconv from 'iconv-lite';
+import Config from '../config/config';
 
 export default class ScriptChunk {
 
-    static parse(token: Token): ScriptChunk {
+    static parse(token: Token, config: Config): ScriptChunk {
         const maybeSettings = /{.+}/.exec(token.info);
         if (maybeSettings && maybeSettings.length > 0 ) {
             const settings: any = RJSON.parse(maybeSettings[0]);
@@ -19,7 +20,7 @@ export default class ScriptChunk {
                     settings.encoding && iconv.encodingExists(settings.encoding) 
                         ? settings.encoding 
                         : ScriptChunk.defaultEncoding;
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin, encoding);
+                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin, encoding, config.env);
             }
         }
         return new InvalidScriptChunk();
@@ -37,16 +38,19 @@ export default class ScriptChunk {
 
     public readonly encoding: string;
 
+    public readonly env: any;
+
     process: ChildProcess | undefined = undefined;
 
     triedToKillBySignal: boolean = false;
 
-    constructor(script: string, cmd: string, args: string[], stdin: boolean, encoding: string) {
+    constructor(script: string, cmd: string, args: string[], stdin: boolean, encoding: string, env: any) {
         this.script = script;
         this.cmd = cmd;
         this.args = args;
         this.stdin = stdin;
         this.encoding = encoding;
+        this.env = env;
     }
 
     public get isRunnable(): boolean {
@@ -67,7 +71,8 @@ export default class ScriptChunk {
                 this.args.map(a => this.convertEncoding(a)),
                 {
                     detached: detachProcess,
-                    cwd: workingDir.fsPath
+                    cwd: workingDir.fsPath,
+                    env: this.env
                 }
             );
             process.stdin.write(this.convertEncoding(this.script));
@@ -78,7 +83,8 @@ export default class ScriptChunk {
                 this.args.concat(this.script).map(a => this.convertEncoding(a)),
                 {
                     detached: detachProcess,
-                    cwd: workingDir.fsPath
+                    cwd: workingDir.fsPath,
+                    env: this.env
                 }
             );
         }
@@ -129,7 +135,7 @@ export default class ScriptChunk {
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', [], false, ScriptChunk.defaultEncoding);
+        super('', '', [], false, ScriptChunk.defaultEncoding, {});
     }
 
     public get isRunnable(): boolean {
