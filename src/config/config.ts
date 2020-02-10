@@ -61,10 +61,11 @@ export default class Config {
     }
 
     static resolve(baseDirectoryPath: string, config: any, configDocuments: vscode.TextDocument[]): Config {
+        const env = objectAssignDeep({}, process.env);
         return new Config(
             vscode.Uri.file(baseDirectoryPath),
             configDocuments,
-            config.environment ? objectAssignDeep(config.environment, process.env) : process.env,
+            config.environment ? objectAssignDeep(env, config.environment) : env,
             config.variables ? config.variables : {}
         );
     }
