@@ -13,8 +13,8 @@ const barbe = require('barbe');
 
 export default class OpsViewDocument {
 
-    static render(context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): OpsViewDocument {
-        const opsViewDocument = new OpsViewDocument(context, eventBus, document, panel);
+    static async render(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<OpsViewDocument> {
+        let opsViewDocument: OpsViewDocument = new OpsViewDocument(context, eventBus, document, config, panel);
         context.subscriptions.push(opsViewDocument);
         return opsViewDocument;
     }
@@ -31,53 +31,30 @@ export default class OpsViewDocument {
 
     private readonly eventBus: OpsViewEventBus;
 
-    private readonly workspace: vscode.WorkspaceFolder | null;
-
     private readonly mdEngine: MarkdownEngine;
 
     private disposables: vscode.Disposable[] = [];
 
-    get workingDirectory(): vscode.Uri {
-        return vscode.Uri.file(path.dirname(this.document.uri.fsPath));
-    }
-
-    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel) {
+    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, config: Config, panel: vscode.WebviewPanel) {
         this.context = context;
         this.eventBus = eventBus;
         this.panel = panel;
         this.document = document;
-
-        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-            this.workspace = vscode.workspace.workspaceFolders[0];
-        } else {
-            this.workspace = null;
-        }
-
-        if (this.workspace) {
-            this.config = Config.load(this.workspace.uri);
-        } else {
-            this.config = Config.default();
-        }
+        this.config = config;
 
         this.mdEngine = new MarkdownEngine(this.config);
 
         const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri, this.config);
-        this.panel.title = `OpsView: ${path.basename(this.document.uri.fsPath)}`;
+        this.scriptChunkManager = manager;
         this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);
         this.disposables.push(this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions));
-        this.scriptChunkManager = manager;
         this.disposables.push(vscode.workspace.onDidChangeTextDocument(e => this.notifyDocuemntChange(e), this.context.subscriptions));
         this.disposables.push(this.panel.onDidChangeViewState(e => this.changeViewState(e), this.context.subscriptions));
     }
 
     private getDocuemntText(): string {
-        if (this.workspace) {
-            const config = Config.load(this.workspace.uri);
-            return barbe(this.document.getText(), ['{{', '}}'], config.variables);
-        } else {
-            return this.document.getText();
-        }
+        return barbe(this.document.getText(), ['{{', '}}'], this.config.variables);
     }
 
     private webviewContent(content: string): string {
@@ -130,7 +107,7 @@ export default class OpsViewDocument {
         const scriptChunk = this.scriptChunkManager.getScriptChunk(scriptChunkId);
         this.eventBus.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         try {
-            const proc = scriptChunk.spawnProcess(this.workingDirectory);
+            const proc = scriptChunk.spawnProcess(this.config.baseDirectory);
             if (proc.stdout) {
                 proc.stdout
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
@@ -174,7 +151,10 @@ export default class OpsViewDocument {
         if (this.changeNotificationTimer) {
             clearTimeout(this.changeNotificationTimer);
         }
-        if (e.document.uri.fsPath === this.document.uri.fsPath) {
+        const changedPath = e.document.uri.fsPath;
+        if (changedPath === this.document.uri.fsPath 
+            || this.config.configDocuments.filter(d => changedPath === d.uri.fsPath).length > 0) {
+            
             this.changeNotificationTimer = setTimeout(() => {
                 this.eventBus.publish(ChangedDocument.topic, new ChangedDocument());
             }, this.changeNotificationDelayMs);

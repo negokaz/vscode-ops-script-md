@@ -1,23 +1,36 @@
 import * as vscode from 'vscode';
 import * as yaml from 'yaml';
+import * as path from 'path';
 import * as fs from 'fs';
 
 import LogEntry from './log/LogEntry';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded as LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import OpsViewEventBus from './opsViewEventBus';
+import Config from './config/config';
 
 const { strOptions } = require('yaml/types');
 strOptions.fold.lineWidth = Number.MAX_VALUE; // avoid to wrap logs
 
 export default class OpsViewLog {
 
-    static active(context: vscode.ExtensionContext, eventBus: OpsViewEventBus ,scriptChunkManager: ScriptChunkManager, logPath: vscode.Uri): OpsViewLog {
+    static async active(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, scriptChunkManager: ScriptChunkManager): Promise<OpsViewLog> {
+
+        const logDir = await OpsViewLog.createLogDirectoryIfNotExists(config.baseDirectory);
+        const logFilename = path.basename(document.uri.fsPath, path.extname(document.uri.fsPath)) + '.log.yml';
+        const logPath = vscode.Uri.file(path.join(logDir.fsPath, logFilename));
+
         const opsViewLog = new OpsViewLog(eventBus, scriptChunkManager, logPath);
         opsViewLog.subscribeEvents();
         opsViewLog.publishLog();
         context.subscriptions.push(opsViewLog);
         return opsViewLog;
+    }
+
+    private static async createLogDirectoryIfNotExists(baseDirectory: vscode.Uri): Promise<vscode.Uri> {
+        const logDir = path.join(baseDirectory.fsPath, 'logs');
+        await fs.promises.mkdir(logDir, { recursive: true });
+        return vscode.Uri.file(logDir);
     }
 
     private readonly eventBus: OpsViewEventBus;

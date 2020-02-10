@@ -15,10 +15,10 @@
 		"Markdown",
 		"Operations"
 	],
-    "galleryBanner": {
-        "color": "#000000",
-        "theme": "dark"
-    },
+	"galleryBanner": {
+		"color": "#000000",
+		"theme": "dark"
+	},
 	"activationEvents": [
 		"onCommand:opsScriptMD.openOpsView",
 		"onCommand:opsScriptMD.openOpsViewToTheSide"
@@ -99,7 +99,7 @@
 	"dependencies": {
 		"barbe": "^3.0.15",
 		"debug": "^4.1.1",
-		"glob": "^7.1.3",
+		"fast-glob": "^3.1.1",
 		"highlight.js": "^9.15.6",
 		"iconv-lite": "^0.5.0",
 		"markdown-it": "^10.0.0",

@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
 import uuidv4 from 'uuid/v4';
 
 import OpsViewDocument from './opsViewDocument';
@@ -8,8 +7,7 @@ import OpsViewLog from './opsViewLog';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 import OpsViewEventBus from './opsViewEventBus';
-
-const resourceDirectoryName = 'media';
+import Config from './config/config';
 
 export default class OpsView {
 
@@ -28,7 +26,7 @@ export default class OpsView {
             const viewId = uuidv4();
             const panel = vscode.window.createWebviewPanel(
                 'OpsView',
-                'OpsView: ',
+                `OpsView: ${path.basename(document.uri.fsPath)}`,
                 viewColumn,
                 {
                     enableScripts: true,
@@ -37,7 +35,6 @@ export default class OpsView {
             );
             const opsView = new OpsView(context, viewId, panel, document);
             context.subscriptions.push(opsView);
-
             opsView.render();
         };
     }
@@ -61,7 +58,7 @@ export default class OpsView {
         this.document = document;
     }
 
-    public render() {
+    public async render(): Promise<void> {
         this.eventBus.unsbscribeAll();
         if (this.opsViewDocument) {
             this.opsViewDocument.dispose();
@@ -72,14 +69,9 @@ export default class OpsView {
 
         this.subscribeEvents();
 
-        const logDir = this.createLogDirectoryIfNotExists(this.document);
-        const logFilename = path.basename(this.document.uri.fsPath, path.extname(this.document.uri.fsPath)) + '.log.yml';
-        const logPath = vscode.Uri.file(path.join(logDir.fsPath, logFilename));
-        
-        const docuemnt = OpsViewDocument.render(this.context, this.eventBus, this.document, this.panel);
-
-        this.opsViewDocument = docuemnt;
-        this.opsViewLog = OpsViewLog.active(this.context, this.eventBus, docuemnt.scriptChunkManager, logPath);
+        const config = await Config.load(this.document.uri);
+        this.opsViewDocument = await OpsViewDocument.render(this.context, config, this.eventBus, this.document, this.panel);
+        this.opsViewLog = await OpsViewLog.active(this.context, config, this.eventBus, this.document, this.opsViewDocument.scriptChunkManager);
     }
 
     private subscribeEvents() {
@@ -116,20 +108,6 @@ export default class OpsView {
                 this.opsViewDocument.postMessage({ event: 'changedDocument' });
             }
         });
-    }
-
-    private createLogDirectoryIfNotExists(document: vscode.TextDocument): vscode.Uri {
-        let rootUri: vscode.Uri;
-        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-            rootUri = vscode.workspace.workspaceFolders[0].uri;
-        } else {
-            rootUri = vscode.Uri.file(path.dirname(document.uri.fsPath));
-        }
-        const logDir = path.join(rootUri.fsPath, 'logs');
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir);
-        }
-        return vscode.Uri.file(logDir);
     }
 
     public dispose(): void {
