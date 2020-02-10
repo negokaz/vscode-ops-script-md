@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 import uuidv4 from 'uuid/v4';
 
 import OpsViewDocument from './opsViewDocument';
@@ -8,8 +8,6 @@ import OpsViewLog from './opsViewLog';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 import OpsViewEventBus from './opsViewEventBus';
-
-const resourceDirectoryName = 'media';
 
 export default class OpsView {
 
@@ -61,7 +59,7 @@ export default class OpsView {
         this.document = document;
     }
 
-    public render() {
+    public async render(): Promise<void> {
         this.eventBus.unsbscribeAll();
         if (this.opsViewDocument) {
             this.opsViewDocument.dispose();
@@ -72,14 +70,12 @@ export default class OpsView {
 
         this.subscribeEvents();
 
-        const logDir = this.createLogDirectoryIfNotExists(this.document);
+        const logDir = await this.createLogDirectoryIfNotExists(this.document);
         const logFilename = path.basename(this.document.uri.fsPath, path.extname(this.document.uri.fsPath)) + '.log.yml';
         const logPath = vscode.Uri.file(path.join(logDir.fsPath, logFilename));
-        
-        const docuemnt = OpsViewDocument.render(this.context, this.eventBus, this.document, this.panel);
-
-        this.opsViewDocument = docuemnt;
-        this.opsViewLog = OpsViewLog.active(this.context, this.eventBus, docuemnt.scriptChunkManager, logPath);
+    
+        this.opsViewDocument = await OpsViewDocument.render(this.context, this.eventBus, this.document, this.panel);
+        this.opsViewLog = OpsViewLog.active(this.context, this.eventBus, this.opsViewDocument.scriptChunkManager, logPath);
     }
 
     private subscribeEvents() {
@@ -118,7 +114,7 @@ export default class OpsView {
         });
     }
 
-    private createLogDirectoryIfNotExists(document: vscode.TextDocument): vscode.Uri {
+    private async createLogDirectoryIfNotExists(document: vscode.TextDocument): Promise<vscode.Uri> {
         let rootUri: vscode.Uri;
         if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
             rootUri = vscode.workspace.workspaceFolders[0].uri;
@@ -126,9 +122,8 @@ export default class OpsView {
             rootUri = vscode.Uri.file(path.dirname(document.uri.fsPath));
         }
         const logDir = path.join(rootUri.fsPath, 'logs');
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir);
-        }
+        await fs.mkdir(logDir, { recursive: true });
+
         return vscode.Uri.file(logDir);
     }
 
