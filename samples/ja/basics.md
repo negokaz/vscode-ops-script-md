@@ -36,6 +36,15 @@ do
 done
 ```
 
+## 文字エンコーディングを指定する
+
+コマンドの入出力はデフォルトで UTF-8 として扱われます。
+必要に応じて `encoding` オプションから文字コードを指定できます。
+
+```bash {cmd: ["Powershell", "-Command"], encoding: "shift-jis" }
+ping 127.0.0.1
+```
+
 ## 値の埋め込み
 
 任意の箇所に値を埋め込むことができます。
@@ -70,3 +79,13 @@ variables:
 `opsscript-staging.yml` の設定値によって `opsscript.yml` の設定値が上書きされます。
 
 つまり、`opsscript.yml` の設定値をデフォルト値として、ステージング環境特有の設定値を `opsscript-staging.yml` に宣言できます。
+
+## 環境変数の設定
+
+`opsscript.yml` ファイルから OpsView で実行されるコマンドに適用する環境変数を設定できます。
+
+**例）`opsscript.yml`**
+```yaml
+environment:
+    LANG: en_US
+```
