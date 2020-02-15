@@ -16,7 +16,7 @@ export default class OpsViewLog {
 
     static async active(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, scriptChunkManager: ScriptChunkManager): Promise<OpsViewLog> {
 
-        const logDir = await OpsViewLog.createLogDirectoryIfNotExists(config.baseDirectory);
+        const logDir = await OpsViewLog.createLogDirectoryIfNotExists(config.baseDirectory, config.documentDirectory);
         const logFilename = path.basename(document.uri.fsPath, path.extname(document.uri.fsPath)) + '.log.yml';
         const logPath = vscode.Uri.file(path.join(logDir.fsPath, logFilename));
 
@@ -27,8 +27,10 @@ export default class OpsViewLog {
         return opsViewLog;
     }
 
-    private static async createLogDirectoryIfNotExists(baseDirectory: vscode.Uri): Promise<vscode.Uri> {
-        const logDir = path.join(baseDirectory.fsPath, 'logs');
+    private static async createLogDirectoryIfNotExists(baseDirectory: vscode.Uri, documentDirectory: vscode.Uri): Promise<vscode.Uri> {
+        const documentRelativePath = documentDirectory.fsPath.substr(baseDirectory.fsPath.length);
+        const logDir = path.join(baseDirectory.fsPath, 'logs', documentRelativePath);
+        console.log(logDir);
         await fs.promises.mkdir(logDir, { recursive: true });
         return vscode.Uri.file(logDir);
     }
