@@ -21,25 +21,23 @@
 
 .reload-notification.active {
     display: inherit;
+    position: fixed;
+    top: 0;
+
     height: var(--opsscript-reload-notification-height);
     width: 100%;
+    z-index: 999;
 
     background-color: var(--opsscript-notification-background);
 }
 
-.reload-notification.active.hover {
-    position: fixed;
-    top: 0;
-
-    z-index: 999;
-}
-
 .reload-trigger {
+    display: inline-block;
     user-select: none;
     cursor: pointer;
     color: var(--opsscript-notification-foreground);
-
-    margin-left: 0.5rem;
+    width: 100%;
+    padding-left: 0.5rem;
 }
 
 .reload-trigger:hover {
