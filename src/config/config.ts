@@ -9,6 +9,7 @@ const objectAssignDeep = require(`object-assign-deep`);
 export default class Config {
 
     static async load(documentUri: vscode.Uri): Promise<Config> {
+        const documentDirectoryPath = path.dirname(documentUri.fsPath);
         const configPath = await Config.findConfigFile(path.dirname(documentUri.fsPath));
         if (configPath) {
             const baseDirectoryPath = path.dirname(configPath.fsPath);
@@ -43,9 +44,9 @@ export default class Config {
             if (overwritecConfigDocument) {
                 documents.push(overwritecConfigDocument);
             }
-            return Config.resolve(baseDirectoryPath, objectAssignDeep(config, overwriteConfig), documents);
+            return Config.resolve(baseDirectoryPath, documentDirectoryPath, objectAssignDeep(config, overwriteConfig), documents);
         }
-        return Config.resolve(path.dirname(documentUri.fsPath), {}, []);
+        return Config.resolve(documentDirectoryPath, documentDirectoryPath, {}, []);
     }
 
     private static findConfigFile(baseDirectoryPath: string): Promise<vscode.Uri | null> {
@@ -60,10 +61,11 @@ export default class Config {
             .catch(_ => this.findConfigFile(parentDirPath));
     }
 
-    static resolve(baseDirectoryPath: string, config: any, configDocuments: vscode.TextDocument[]): Config {
+    static resolve(baseDirectoryPath: string, documentDirectoryPath: string, config: any, configDocuments: vscode.TextDocument[]): Config {
         const env = objectAssignDeep({}, process.env);
         return new Config(
             vscode.Uri.file(baseDirectoryPath),
+            vscode.Uri.file(documentDirectoryPath),
             configDocuments,
             config.environment ? objectAssignDeep(env, config.environment) : env,
             config.variables ? config.variables : {}
@@ -72,14 +74,17 @@ export default class Config {
 
     public readonly baseDirectory: vscode.Uri;
 
+    public readonly documentDirectory: vscode.Uri;
+
     public readonly configDocuments: vscode.TextDocument[];
 
     public readonly env: any;
 
     public readonly variables: any;
 
-    constructor(baseDirectory: vscode.Uri, configDocuments: vscode.TextDocument[], env: any, variables: any) {
+    constructor(baseDirectory: vscode.Uri, documentDirectory: vscode.Uri, configDocuments: vscode.TextDocument[], env: any, variables: any) {
         this.baseDirectory = baseDirectory;
+        this.documentDirectory = documentDirectory;
         this.configDocuments = configDocuments;
         this.env = env;
         this.variables = variables;

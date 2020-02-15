@@ -105,7 +105,7 @@ export default class OpsViewDocument {
         const scriptChunk = this.scriptChunkManager.getScriptChunk(scriptChunkId);
         this.eventBus.publish(ExecutionStarted.topic, new ExecutionStarted(scriptChunkId, new Date()));
         try {
-            const proc = scriptChunk.spawnProcess(this.config.baseDirectory);
+            const proc = scriptChunk.spawnProcess(this.config.documentDirectory);
             if (proc.stdout) {
                 proc.stdout
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
