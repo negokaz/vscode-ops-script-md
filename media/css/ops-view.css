@@ -75,6 +75,7 @@
     cursor: pointer;
     user-select: none;
     color: var(--vscode-activityBar-inactiveForeground);
+    font-size: 0.95rem;
 
     display: inline-block;
     vertical-align: middle;
@@ -88,7 +89,7 @@
 }
 
 .script-chunk-control-panel a:active {
-    font-size: 120%;
+    font-size: 1.1rem;
 }
 
 .ready.script-chunk .script-chunk-trigger::before {
@@ -152,5 +153,27 @@
 }
 
 .copy-script-trigger::before {
-    content: '\ec4c';
+    content: '\ec51';
 }
+
+.tippy-content {
+    font-family: 'IcoFont';
+    font-size: 0.7rem;
+}
+
+.tippy-tooltip.opsview-theme {
+    background-color: var(--vscode-sideBarSectionHeader-background);
+    color: var(--vscode-sideBarTitle-foreground);
+}
+.tippy-tooltip.opsview-theme[data-placement^='top'] .tippy-arrow {
+    border-top-color: var(--vscode-sideBarSectionHeader-background);
+  }
+  .tippy-tooltip.opsview-theme[data-placement^='bottom'] .tippy-arrow {
+    border-bottom-color: var(--vscode-sideBarSectionHeader-background);
+  }
+  .tippy-tooltip.opsview-theme[data-placement^='left'] .tippy-arrow {
+    border-left-color: var(--vscode-sideBarSectionHeader-background);
+  }
+  .tippy-tooltip.opsview-theme[data-placement^='right'] .tippy-arrow {
+    border-right-color: var(--vscode-sideBarSectionHeader-background);
+  }
