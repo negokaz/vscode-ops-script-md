@@ -62,13 +62,13 @@ export default class OpsViewDocument {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'icofont.min.css')}">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'spinner.css')}">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'markdown.css')}">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'markdown-ext.css')}">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'ops-view.css')}">
-        <link rel="stylesheet" href="${this.resourceUri('css', 'highlight.css')}">
-        <script src="${this.resourceUri('js', 'ops-view.js')}"></script>
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'icofont.min.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'spinner.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'markdown.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'markdown-ext.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'ops-view.css')}">
+        <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'highlight.css')}">
+        <script src="${this.resourceUri('dist', 'opsView.js')}"></script>
     </head>
     <body>
         <div class="reload-notification"></div>
@@ -82,9 +82,8 @@ export default class OpsViewDocument {
     }
     
     private resourceUri(...pathElements: string[]): vscode.Uri {
-        const resourceDirectoryName = 'media';
         const onDiskPath = vscode.Uri.file(
-            path.join(this.context.extensionPath, resourceDirectoryName, path.join(...pathElements))
+            path.join(this.context.extensionPath, path.join(...pathElements))
         );
         return onDiskPath.with({ scheme: 'vscode-resource' });
     }
