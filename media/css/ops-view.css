@@ -3,6 +3,15 @@
     --opsscript-color-success: #4caf50;
     --opsscript-color-failure: #f44336;
 
+    --opsscript-accent: var(--vscode-activityBarBadge-background);
+    --opsscript-trigger-focus: var(--vscode-breadcrumb-focusForeground);
+    --opsscript-trigger: var(--vscode-breadcrumb-foreground);
+    --opsscript-notification-focus-foreground: var(--vscode-breadcrumb-focusForeground);
+    --opsscript-notification-foreground: var(--vscode-breadcrumb-foreground);
+    --opsscript-notification-background: var(--vscode-list-inactiveSelectionBackground);
+    --opsscript-label-foreground: var(--vscode-sideBarTitle-foreground);
+    --opsscript-label-background: var(--vscode-sideBarSectionHeader-background);
+
     --opsscript-reload-notification-height: 1.5rem;
 }
 
@@ -15,7 +24,7 @@
     height: var(--opsscript-reload-notification-height);
     width: 100%;
 
-    background-color: var(--vscode-activityBar-background);
+    background-color: var(--opsscript-notification-background);
 }
 
 .reload-notification.active.hover {
@@ -28,20 +37,20 @@
 .reload-trigger {
     user-select: none;
     cursor: pointer;
-    color: var(--vscode-activityBar-inactiveForeground);
+    color: var(--opsscript-notification-foreground);
 
     margin-left: 0.5rem;
 }
 
 .reload-trigger:hover {
     text-decoration: none;
-    color: var(--vscode-activityBar-foreground);
+    color: var(--opsscript-notification-focus-foreground);
 }
 
 .reload-trigger::before {
     font-family: 'IcoFont';
     content: '\ec80';
-    color: var(--vscode-activityBarBadge-background);
+    color: var(--opsscript-accent);
 
     margin-right: 0.2rem;
 }
@@ -59,8 +68,8 @@
     top: 0;
     left: 0;
     
-    color: var(--vscode-sideBarTitle-foreground);
-    background-color: var(--vscode-sideBarSectionHeader-background);
+    color: var(--opsscript-label-foreground);
+    background-color: var(--opsscript-label-background);
     padding: 0 0.5rem;
 }
 
@@ -74,7 +83,7 @@
     font-family: 'IcoFont';
     cursor: pointer;
     user-select: none;
-    color: var(--vscode-activityBar-inactiveForeground);
+    color: var(--opsscript-trigger);
     font-size: 0.95rem;
 
     display: inline-block;
@@ -85,7 +94,7 @@
 
 .script-chunk-control-panel a:hover {
     text-decoration: none;
-    color: var(--vscode-activityBar-foreground);
+    color: var(--opsscript-trigger-focus);
 }
 
 .script-chunk-control-panel a:active {
@@ -160,20 +169,19 @@
     font-family: 'IcoFont';
     font-size: 0.7rem;
 }
-
 .tippy-tooltip.opsview-theme {
-    background-color: var(--vscode-sideBarSectionHeader-background);
-    color: var(--vscode-sideBarTitle-foreground);
+    color: var(--opsscript-notification-foreground);
+    background-color: var(--opsscript-notification-background);
 }
 .tippy-tooltip.opsview-theme[data-placement^='top'] .tippy-arrow {
-    border-top-color: var(--vscode-sideBarSectionHeader-background);
-  }
-  .tippy-tooltip.opsview-theme[data-placement^='bottom'] .tippy-arrow {
-    border-bottom-color: var(--vscode-sideBarSectionHeader-background);
-  }
-  .tippy-tooltip.opsview-theme[data-placement^='left'] .tippy-arrow {
-    border-left-color: var(--vscode-sideBarSectionHeader-background);
-  }
-  .tippy-tooltip.opsview-theme[data-placement^='right'] .tippy-arrow {
-    border-right-color: var(--vscode-sideBarSectionHeader-background);
-  }
+    border-top-color: var(--opsscript-notification-background);
+}
+.tippy-tooltip.opsview-theme[data-placement^='bottom'] .tippy-arrow {
+    border-bottom-color: var(--opsscript-notification-background);
+}
+.tippy-tooltip.opsview-theme[data-placement^='left'] .tippy-arrow {
+    border-left-color: var(--opsscript-notification-background);
+}
+.tippy-tooltip.opsview-theme[data-placement^='right'] .tippy-arrow {
+    border-right-color: var(--opsscript-notification-background);
+}
