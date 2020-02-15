@@ -8,6 +8,7 @@ import ScriptChunkManager from './scriptChunk/scriptChunkManager';
 import { TriggeredReload, ChangedDocument } from './opsViewEvents';
 import * as iconv from 'iconv-lite';
 import OpsViewEventBus from './opsViewEventBus';
+import CarriageReturnRemover from './util/carriageReturnRemover';
 
 const barbe = require('barbe');
 
@@ -109,6 +110,7 @@ export default class OpsViewDocument {
             if (proc.stdout) {
                 proc.stdout
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
+                    .pipe(CarriageReturnRemover.transformStream())
                     .on('data', data => {
                         this.eventBus.publish(StdoutProduced.topic, new StdoutProduced(scriptChunkId, data));
                     });
@@ -116,6 +118,7 @@ export default class OpsViewDocument {
             if (proc.stderr) {
                 proc.stderr
                     .pipe(iconv.decodeStream(scriptChunk.encoding))
+                    .pipe(CarriageReturnRemover.transformStream())
                     .on('data', data => {
                         this.eventBus.publish(StderrProduced.topic, new StderrProduced(scriptChunkId, data));
                     });
