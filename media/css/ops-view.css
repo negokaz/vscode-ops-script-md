@@ -73,7 +73,7 @@
 
 .script-chunk-control-panel {
     position: absolute;
-    top: 0.15rem;
+    top: 0.30rem;
     right: 0.25rem;
 }
 
@@ -87,7 +87,7 @@
     display: inline-block;
     vertical-align: middle;
     width: 1rem;
-    margin-right: 0.2rem;
+    margin-right: 0.3rem;
 }
 
 .script-chunk-control-panel a:hover {
