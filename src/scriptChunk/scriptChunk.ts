@@ -59,7 +59,16 @@ export default class ScriptChunk {
 
     public get commandLine(): string {
         const header = this.stdin ? '[stdin] ' : '';
-        return `${header}${this.cmd}${this.args.length > 0 ? ' ' + this.args.join(' ') : ''}`;
+        function quoteIfContainsSpace(str: string): string {
+            const trimed = str.trim();
+            if (trimed.indexOf(' ') > 0 || trimed.indexOf('\t') > 0) {
+                // arg contains space
+                return `"${str}"`;
+            } else {
+                return str;
+            }
+        }
+        return `${header}${quoteIfContainsSpace(this.cmd)}${this.args.length > 0 ? ' ' + this.args.map(quoteIfContainsSpace).join(' ') : ''}`;
     }
 
     public spawnProcess(workingDir: Uri): ChildProcess {
