@@ -30,7 +30,6 @@ export default class OpsViewLog {
     private static async createLogDirectoryIfNotExists(baseDirectory: vscode.Uri, documentDirectory: vscode.Uri): Promise<vscode.Uri> {
         const documentRelativePath = documentDirectory.fsPath.substr(baseDirectory.fsPath.length);
         const logDir = path.join(baseDirectory.fsPath, 'logs', documentRelativePath);
-        console.log(logDir);
         await fs.promises.mkdir(logDir, { recursive: true });
         return vscode.Uri.file(logDir);
     }
