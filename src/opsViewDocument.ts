@@ -71,7 +71,6 @@ export default class OpsViewDocument {
         <script src="${this.resourceUri('dist', 'opsView.js')}"></script>
     </head>
     <body>
-        <div class="reload-notification"></div>
         <div class="reload-notification hover">
             <a class="reload-trigger" title="更新">ドキュメントが更新されました。クリックでリロード</a>
         </div>

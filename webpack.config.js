@@ -52,6 +52,14 @@ const opsViewConfig = {
   devtool: 'source-map',
   resolve: {
     extensions: ['.ts', '.js']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   }
 };
 

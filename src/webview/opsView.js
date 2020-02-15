@@ -1,3 +1,7 @@
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/shift-away-subtle.css';
+
 window.addEventListener('load', () => {
     
     const vscode = acquireVsCodeApi();
@@ -116,12 +120,25 @@ window.addEventListener('load', () => {
     });
 
     document.querySelectorAll('a.copy-script-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
+        // tippy.js settings
+        // see: https://atomiks.github.io/tippyjs/all-props/
+        const tippyInstance = tippy(trigger, {
+            trigger: 'manual',
+            content: '&#xec4b;',
+            animation: 'shift-away-subtle',
+            duration: [250, 250],
+            theme: 'opsview',
+            onShown: (instance) => {
+                setTimeout(() => instance.hide(), 500);
+            }
+        });
+
+        trigger.addEventListener('click', (event) => {
             const copyContent = 
                 trigger
                     .closest('.script-chunk,.read-only-script-chunk')
                     .querySelector('.script-chunk-code');
-
+            // copy
             const tmp = document.createElement('textarea');
             tmp.style.position = 'fixed';
             tmp.style.left = '-100%';
@@ -130,6 +147,8 @@ window.addEventListener('load', () => {
             tmp.select();
             document.execCommand('copy');
             document.body.removeChild(tmp);
+            // show tooltip
+            tippyInstance.show();
         });
     });
 });
