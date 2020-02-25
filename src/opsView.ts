@@ -11,32 +11,21 @@ import Config from './config/config';
 
 export default class OpsView {
 
-    static open(context: vscode.ExtensionContext, viewColumn: vscode.ViewColumn) {
-        return async (uri?: vscode.Uri) => {
-
-            let document: vscode.TextDocument;
-            if (uri) {
-                document = await vscode.workspace.openTextDocument(uri);
-            } else if (vscode.window.activeTextEditor) {
-                document = vscode.window.activeTextEditor.document;
-            } else {
-                vscode.window.showErrorMessage("Could not resolve document URI.");
-                return;
+    static async open(context: vscode.ExtensionContext, viewColumn: vscode.ViewColumn, document: vscode.TextDocument): Promise<OpsView> {
+        const viewId = uuidv4();
+        const panel = vscode.window.createWebviewPanel(
+            'OpsView',
+            `OpsView: ${path.basename(document.uri.fsPath)}`,
+            viewColumn,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
             }
-            const viewId = uuidv4();
-            const panel = vscode.window.createWebviewPanel(
-                'OpsView',
-                `OpsView: ${path.basename(document.uri.fsPath)}`,
-                viewColumn,
-                {
-                    enableScripts: true,
-                    retainContextWhenHidden: true,
-                }
-            );
-            const opsView = new OpsView(context, viewId, panel, document);
-            context.subscriptions.push(opsView);
-            opsView.render();
-        };
+        );
+        const opsView = new OpsView(context, viewId, panel, document);
+        context.subscriptions.push(opsView);
+        opsView.render();
+        return opsView;
     }
 
     private readonly context: vscode.ExtensionContext;
@@ -56,6 +45,18 @@ export default class OpsView {
         this.eventBus = OpsViewEventBus.for(viewId);
         this.panel = panel;
         this.document = document;
+    }
+
+    public documentUri(): vscode.Uri {
+        return this.document.uri;
+    }
+
+    public show(viewColumn: vscode.ViewColumn): void {
+        this.panel.reveal(viewColumn);
+    }
+
+    public onDidClose(handler: () => void): void {
+        this.panel.onDidDispose(handler);
     }
 
     public async render(): Promise<void> {
