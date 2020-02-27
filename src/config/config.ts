@@ -17,13 +17,13 @@ export default class Config {
                 vscode.workspace.openTextDocument(configPath)
                     .then(document => [document, yaml.parse(document.getText())]);
             const fetchOverwriteConfig: Thenable<[vscode.TextDocument | null, any]> = 
-                fastGlob(path.join(baseDirectoryPath, 'opsscript-*.yml'))
+                fastGlob(['opsscript-*.yml'], { cwd: baseDirectoryPath })
                     .then(paths => {
                         if (paths.length > 1) {
                             console.error("config files too many exists");
                             return Promise.resolve(null) as Thenable<vscode.TextDocument>;
                         } else if (paths.length === 1) {
-                            return vscode.workspace.openTextDocument(paths[0]);
+                            return vscode.workspace.openTextDocument(path.join(baseDirectoryPath, paths[0]));
                         } else {
                             return Promise.resolve(null) as Thenable<vscode.TextDocument>;
                         }
