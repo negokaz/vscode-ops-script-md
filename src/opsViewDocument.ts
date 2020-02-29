@@ -15,9 +15,15 @@ const barbe = require('barbe');
 export default class OpsViewDocument {
 
     static async render(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<OpsViewDocument> {
-        let opsViewDocument: OpsViewDocument = new OpsViewDocument(context, eventBus, document, config, panel);
+        const mdEngine = new MarkdownEngine(config);
+        const result = await mdEngine.render(OpsViewDocument.getDocuemntText(document, config), document.uri, config);
+        let opsViewDocument: OpsViewDocument = new OpsViewDocument(context, eventBus, document, config, panel, result.html, result.scriptChunkManager);
         context.subscriptions.push(opsViewDocument);
         return opsViewDocument;
+    }
+
+    private static getDocuemntText(document: vscode.TextDocument, config: Config): string {
+        return barbe(document.getText(), ['{{', '}}'], config.variables);
     }
 
     readonly panel: vscode.WebviewPanel;
@@ -31,31 +37,22 @@ export default class OpsViewDocument {
     private readonly context: vscode.ExtensionContext;
 
     private readonly eventBus: OpsViewEventBus;
-
-    private readonly mdEngine: MarkdownEngine;
-
+    
     private disposables: vscode.Disposable[] = [];
 
-    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, config: Config, panel: vscode.WebviewPanel) {
+    private constructor (context: vscode.ExtensionContext, eventBus: OpsViewEventBus, document: vscode.TextDocument, config: Config, panel: vscode.WebviewPanel, content: string, scriptChunkManager: ScriptChunkManager) {
         this.context = context;
         this.eventBus = eventBus;
         this.panel = panel;
         this.document = document;
         this.config = config;
 
-        this.mdEngine = new MarkdownEngine(this.config);
-
-        const [content, manager] = this.mdEngine.render(this.getDocuemntText(), document.uri, this.config);
-        this.scriptChunkManager = manager;
+        this.scriptChunkManager = scriptChunkManager;
         this.panel.webview.html = ''; // html に差が無い場合、WebView の内容が更新されないため
         this.panel.webview.html = this.webviewContent(content);
         this.disposables.push(this.panel.webview.onDidReceiveMessage(m => this.receiveOpsViewMessage(m), context.subscriptions));
         this.disposables.push(vscode.workspace.onDidChangeTextDocument(e => this.notifyDocuemntChange(e), this.context.subscriptions));
         this.disposables.push(this.panel.onDidChangeViewState(e => this.changeViewState(e), this.context.subscriptions));
-    }
-
-    private getDocuemntText(): string {
-        return barbe(this.document.getText(), ['{{', '}}'], this.config.variables);
     }
 
     private webviewContent(content: string): string {

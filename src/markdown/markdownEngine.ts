@@ -7,6 +7,8 @@ import ScriptChunkManager from '../scriptChunk/scriptChunkManager';
 import * as vscode from 'vscode';
 import markdownVscResourceLink from './markdownVscResourceLink';
 import Config from '../config/config';
+import ParseResult from './parseResult';
+import MarkdownRenderEnv from './markdownRenderEnv';
 
 export default class MarkdownEngine {
 
@@ -30,14 +32,15 @@ export default class MarkdownEngine {
             }
         }) as ExtendedMarkdownIt;
         this.md.use(markdownContainer);
-        this.md.use(markdownItScriptChunk(this.config));
+        this.md.use(markdownItScriptChunk());
     }
 
-    public render(markdown: string, documentUri: vscode.Uri, config: Config): [string, ScriptChunkManager] {
-        this.md.use(markdownVscResourceLink(documentUri));
+    public async render(markdown: string, documentUri: vscode.Uri, config: Config): Promise<ParseResult> {
         const tokens = this.md.parse(markdown, {});
-        const manager = new ScriptChunkManager(tokens, config);
-        const html = this.md.renderer.render(manager.tokens, this.md.options, {});
-        return [html, manager];
+        const manager = new ScriptChunkManager(config);
+        this.md.use(markdownVscResourceLink(documentUri));
+        const assignedTokens = await manager.assignScriptChunks(tokens);
+        const html = this.md.renderer.render(assignedTokens, this.md.options, new MarkdownRenderEnv(manager));
+        return new ParseResult(html, manager);
     }
 }
