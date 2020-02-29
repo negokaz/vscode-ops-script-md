@@ -7,19 +7,19 @@ import Config from '../config/config';
 export default class ScriptChunkManager {
 
     public static readonly SCRIPT_CHUNK_ID_ATTR_NAME = "data-script-chunk-id";
-
-    public readonly tokens: Token[];
     
-    scriptChunks: Map<string, ScriptChunk> = new Map();
+    private readonly config: Config;
 
-    constructor(tokens: Token[], config: Config) {
-        this.tokens = this.assignScriptChunkIds(tokens, config);
+    private scriptChunks: Map<string, ScriptChunk> = new Map();
+
+    constructor(config: Config) {
+        this.config = config;
     }
 
-    assignScriptChunkIds(tokens: Token[], config: Config): Token[] {
-        return tokens.map(token => {
+    public assignScriptChunks(tokens: Token[]): Promise<Token[]> {
+        return Promise.all(tokens.map(async token => {
             if (token.type === 'fence') {
-                const chunk = ScriptChunk.parse(token, config);
+                const chunk = await ScriptChunk.parse(token, this.config);
                 if (chunk.isRunnable) {
                     const scriptChunkId = this.generateScriptChunkId(chunk);
                     token.attrSet(ScriptChunkManager.SCRIPT_CHUNK_ID_ATTR_NAME, scriptChunkId);
@@ -27,7 +27,7 @@ export default class ScriptChunkManager {
                 }
             }
             return token;
-        });  
+        }));  
     }
 
     generateScriptChunkId(scriptChunk: ScriptChunk): string {

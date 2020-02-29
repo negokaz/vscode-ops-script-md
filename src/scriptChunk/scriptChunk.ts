@@ -7,20 +7,23 @@ import * as nodeProcess from 'process';
 import { Uri } from 'vscode';
 import * as iconv from 'iconv-lite';
 import Config from '../config/config';
+import which from 'which';
 
 export default class ScriptChunk {
 
-    static parse(token: Token, config: Config): ScriptChunk {
+    static async parse(token: Token, config: Config): Promise<ScriptChunk> {
         const maybeSettings = /{.+}/.exec(token.info);
         if (maybeSettings && maybeSettings.length > 0 ) {
             const settings: any = RJSON.parse(maybeSettings[0]);
             if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
+                const displayCmd = settings.cmd[0];
+                const cmd = await (which(displayCmd, { path: config.env.PATH }).catch(_ => displayCmd));
                 const stdin = settings.stdin ? true : false;
                 const encoding =
                     settings.encoding && iconv.encodingExists(settings.encoding) 
                         ? settings.encoding 
                         : ScriptChunk.defaultEncoding;
-                return new ScriptChunk(token.content, settings.cmd[0], settings.cmd.slice(1), stdin, encoding, config.env);
+                return new ScriptChunk(token.content, displayCmd, cmd, settings.cmd.slice(1), stdin, encoding, config.env);
             }
         }
         return new InvalidScriptChunk();
@@ -29,6 +32,8 @@ export default class ScriptChunk {
     public static readonly defaultEncoding = 'utf-8';
 
     public readonly script: string;
+
+    public readonly displayCmd: string;
 
     public readonly cmd: string;
     
@@ -44,8 +49,9 @@ export default class ScriptChunk {
 
     triedToKillBySignal: boolean = false;
 
-    constructor(script: string, cmd: string, args: string[], stdin: boolean, encoding: string, env: any) {
+    constructor(script: string, displayCmd: string, cmd: string, args: string[], stdin: boolean, encoding: string, env: any) {
         this.script = script;
+        this.displayCmd = displayCmd;
         this.cmd = cmd;
         this.args = args;
         this.stdin = stdin;
@@ -68,7 +74,7 @@ export default class ScriptChunk {
                 return str;
             }
         }
-        return `${header}${quoteIfContainsSpace(this.cmd)}${this.args.length > 0 ? ' ' + this.args.map(quoteIfContainsSpace).join(' ') : ''}`;
+        return `${header}${quoteIfContainsSpace(this.displayCmd)}${this.args.length > 0 ? ' ' + this.args.map(quoteIfContainsSpace).join(' ') : ''}`;
     }
 
     public spawnProcess(workingDir: Uri): ChildProcess {
@@ -144,7 +150,7 @@ export default class ScriptChunk {
 export class InvalidScriptChunk extends ScriptChunk {
 
     constructor() {
-        super('', '', [], false, ScriptChunk.defaultEncoding, {});
+        super('', '', '', [], false, ScriptChunk.defaultEncoding, {});
     }
 
     public get isRunnable(): boolean {

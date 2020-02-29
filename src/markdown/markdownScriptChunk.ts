@@ -1,18 +1,17 @@
 import MarkdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token';
 import Renderer from 'markdown-it/lib/renderer';
-import ScriptChunk from '../scriptChunk/scriptChunk';
 import ScriptChunkManger from '../scriptChunk/scriptChunkManager';
-import Config from '../config/config';
+import MarkdownRenderEnv from './markdownRenderEnv';
 
-export default function markdownItScriptChunk(config: Config) {
+export default function markdownItScriptChunk() {
     return (md: MarkdownIt) => {
         const defaultRender = md.renderer.rules.fence;
-        md.renderer.rules.fence = (tokens: Token[], index: number, options: any, env: any, self: Renderer) => {
+        md.renderer.rules.fence = (tokens: Token[], index: number, options: any, env: MarkdownRenderEnv, self: Renderer) => {
             const token = tokens[index];
             const scriptChunkId = token.attrGet(ScriptChunkManger.SCRIPT_CHUNK_ID_ATTR_NAME);
             if (scriptChunkId) {
-                const chunk = ScriptChunk.parse(token, config);
+                const chunk = env.scriptChunkManager.getScriptChunk(scriptChunkId);
                 return `
                 <div class="ready script-chunk" ${ScriptChunkManger.SCRIPT_CHUNK_ID_ATTR_NAME}="${scriptChunkId}">
                     <span class="script-chunk-label">${chunk.commandLine}</span>
