@@ -9,8 +9,9 @@
     --opsscript-notification-focus-foreground: var(--vscode-breadcrumb-focusForeground);
     --opsscript-notification-foreground: var(--vscode-breadcrumb-foreground);
     --opsscript-notification-background: var(--vscode-list-inactiveSelectionBackground);
-    --opsscript-label-foreground: var(--vscode-sideBarTitle-foreground);
+    --opsscript-label-foreground: var(--vscode-input-foreground);
     --opsscript-label-background: var(--vscode-list-inactiveSelectionBackground);
+    --opsscript-label-error-foreground: var(--vscode-editorError-foreground);
 
     --opsscript-reload-notification-height: 1.5rem;
 }
@@ -69,6 +70,9 @@
     color: var(--opsscript-label-foreground);
     background-color: var(--opsscript-label-background);
     padding: 0 0.5rem;
+}
+.script-chunk-label.error {
+    color: var(--opsscript-label-error-foreground);
 }
 
 .script-chunk-control-panel {

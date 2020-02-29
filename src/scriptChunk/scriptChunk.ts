@@ -12,21 +12,25 @@ import which from 'which';
 export default class ScriptChunk {
 
     static async parse(token: Token, config: Config): Promise<ScriptChunk> {
-        const maybeSettings = /{.+}/.exec(token.info);
-        if (maybeSettings && maybeSettings.length > 0 ) {
-            const settings: any = RJSON.parse(maybeSettings[0]);
-            if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
-                const displayCmd = settings.cmd[0];
-                const cmd = await (which(displayCmd, { path: config.env.PATH }).catch(_ => displayCmd));
-                const stdin = settings.stdin ? true : false;
-                const encoding =
-                    settings.encoding && iconv.encodingExists(settings.encoding) 
-                        ? settings.encoding 
-                        : ScriptChunk.defaultEncoding;
-                return new ScriptChunk(token.content, displayCmd, cmd, settings.cmd.slice(1), stdin, encoding, config.env);
+        try {
+            const maybeSettings = /{.+}/.exec(token.info);
+            if (maybeSettings && maybeSettings.length > 0 ) {
+                const settings: any = RJSON.parse(maybeSettings[0]);
+                if (Array.isArray(settings.cmd) && settings.cmd.length > 0) {
+                    const displayCmd = settings.cmd[0];
+                    const cmd = await (which(displayCmd, { path: config.env.PATH }).catch(_ => displayCmd));
+                    const stdin = settings.stdin ? true : false;
+                    const encoding =
+                        settings.encoding && iconv.encodingExists(settings.encoding) 
+                            ? settings.encoding 
+                            : ScriptChunk.defaultEncoding;
+                    return new ScriptChunk(token.content, displayCmd, cmd, settings.cmd.slice(1), stdin, encoding, config.env);
+                }
             }
+        } catch (e) {
+            return new InvalidScriptChunk(e);
         }
-        return new InvalidScriptChunk();
+        return new DisabledScriptChunk();
     }
 
     public static readonly defaultEncoding = 'utf-8';
@@ -59,8 +63,12 @@ export default class ScriptChunk {
         this.env = env;
     }
 
-    public get isRunnable(): boolean {
+    public get isEnable(): boolean {
         return true;
+    }
+
+    public get error(): Error | undefined {
+        return undefined;
     }
 
     public get commandLine(): string {
@@ -147,13 +155,27 @@ export default class ScriptChunk {
     }
 }
 
-export class InvalidScriptChunk extends ScriptChunk {
+export class DisabledScriptChunk extends ScriptChunk {
 
     constructor() {
         super('', '', '', [], false, ScriptChunk.defaultEncoding, {});
     }
 
-    public get isRunnable(): boolean {
+    public get isEnable(): boolean {
         return false;
+    }
+}
+
+export class InvalidScriptChunk extends ScriptChunk {
+
+    public readonly _error: Error;
+
+    constructor(error: Error) {
+        super('', '', '', [], false, ScriptChunk.defaultEncoding, {});
+        this._error = error;
+    }
+
+    public get error(): Error | undefined {
+        return this._error;
     }
 }

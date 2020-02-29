@@ -20,7 +20,7 @@ export default class ScriptChunkManager {
         return Promise.all(tokens.map(async token => {
             if (token.type === 'fence') {
                 const chunk = await ScriptChunk.parse(token, this.config);
-                if (chunk.isRunnable) {
+                if (chunk.isEnable) {
                     const scriptChunkId = this.generateScriptChunkId(chunk);
                     token.attrSet(ScriptChunkManager.SCRIPT_CHUNK_ID_ATTR_NAME, scriptChunkId);
                     this.scriptChunks.set(scriptChunkId, chunk);
