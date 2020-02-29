@@ -84,7 +84,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.0...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.1
 [0.6.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.0
 [0.5.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.5.0
 [0.4.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.4.2
