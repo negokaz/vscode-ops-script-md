@@ -10,7 +10,7 @@
     --opsscript-notification-foreground: var(--vscode-breadcrumb-foreground);
     --opsscript-notification-background: var(--vscode-list-inactiveSelectionBackground);
     --opsscript-label-foreground: var(--vscode-sideBarTitle-foreground);
-    --opsscript-label-background: var(--vscode-sideBarSectionHeader-background);
+    --opsscript-label-background: var(--vscode-list-inactiveSelectionBackground);
 
     --opsscript-reload-notification-height: 1.5rem;
 }

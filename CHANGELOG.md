@@ -6,6 +6,11 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.6.2] - 2020-03-01
+
+### 機能変更
+- コマンドラベルの背景を他の要素と区別しやすいよう変更
+
 ## [0.6.1] - 2020-02-29
 - 紹介ページに README が表示されない問題を修正
 
@@ -84,7 +89,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.1...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.2
 [0.6.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.1
 [0.6.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.0
 [0.5.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.5.0
