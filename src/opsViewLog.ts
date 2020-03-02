@@ -3,6 +3,8 @@ import * as yaml from 'yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import makeDir from 'make-dir';
+
 import LogEntry from './log/LogEntry';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded as LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
@@ -30,7 +32,7 @@ export default class OpsViewLog {
     private static async createLogDirectoryIfNotExists(baseDirectory: vscode.Uri, documentDirectory: vscode.Uri): Promise<vscode.Uri> {
         const documentRelativePath = documentDirectory.fsPath.substr(baseDirectory.fsPath.length);
         const logDir = path.join(baseDirectory.fsPath, 'logs', documentRelativePath);
-        await fs.promises.mkdir(logDir, { recursive: true });
+        await makeDir(logDir);
         return vscode.Uri.file(logDir);
     }
 
