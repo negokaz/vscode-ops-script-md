@@ -107,7 +107,8 @@ export default class ScriptChunk {
                 {
                     detached: detachProcess,
                     cwd: workingDir.fsPath,
-                    env: this.env
+                    env: this.env,
+                    stdio: ['ignore', 'pipe', 'pipe']
                 }
             );
         }
