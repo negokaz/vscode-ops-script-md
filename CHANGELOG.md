@@ -5,6 +5,9 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 このファイルの書き方に関する推奨事項については、[Keep a Changelog](http://keepachangelog.com/) を確認してください。
 
 ## [リリース予定]
+
+## [0.6.3] - 2020-03-02
+
 ### 機能修正
 - コマンドの記述に問題があるときにドキュメントをリロードできない問題を修正
 - `stdin` オプションが無効にも関わらずパイプが有効になってしまう問題を修正
@@ -92,7 +95,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.2...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.3
 [0.6.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.2
 [0.6.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.1
 [0.6.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.0
