@@ -6,6 +6,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.6.4] - 2020-03-03
+
 ### 機能修正
 - 旧バージョンの vscode でログが出力されない問題を修正
 
@@ -98,7 +100,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.3...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.4
 [0.6.3]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.3
 [0.6.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.2
 [0.6.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.1
