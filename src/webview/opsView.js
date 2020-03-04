@@ -2,9 +2,60 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/shift-away-subtle.css';
 
+import * as AnsiToHtml from 'ansi-to-html';
+
+function AnsiConverterManager() {
+
+    const converters = {};
+
+    const style = getComputedStyle(document.documentElement);
+
+    return {
+
+        getConverter: function (scriptChunkId) {
+            const converter = converters[scriptChunkId];
+            if (converter) {
+                return converter;
+            } else {
+                const newConverter = this.createConverter();
+                converters[scriptChunkId] = newConverter;
+                return newConverter;
+            }
+        },
+
+        createConverter: function() {
+            return new AnsiToHtml({
+                fg: style.getPropertyValue('--vscode-terminal-foreground'),
+                bg: style.getPropertyValue('--vscode-terminal-background'),
+                escapeXML: true,
+                stream: true,
+                colors: {
+                    0: style.getPropertyValue('--vscode-terminal-ansiBlack'),
+                    1: style.getPropertyValue('--vscode-terminal-ansiRed'),
+                    2: style.getPropertyValue('--vscode-terminal-ansiGreen'),
+                    3: style.getPropertyValue('--vscode-terminal-ansiYellow'),
+                    4: style.getPropertyValue('--vscode-terminal-ansiBlue'),
+                    5: style.getPropertyValue('--vscode-terminal-ansiMagenta'),
+                    6: style.getPropertyValue('--vscode-terminal-ansiCyan'),
+                    7: style.getPropertyValue('--vscode-terminal-ansiWhite'),
+                    8: style.getPropertyValue('--vscode-terminal-ansiBrightBlack'),
+                    9: style.getPropertyValue('--vscode-terminal-ansiBrightRed'),
+                    10: style.getPropertyValue('--vscode-terminal-ansiBrightGreen'),
+                    11: style.getPropertyValue('--vscode-terminal-ansiBrightYellow'),
+                    12: style.getPropertyValue('--vscode-terminal-ansiBrightBlue'),
+                    13: style.getPropertyValue('--vscode-terminal-ansiBrightMagenta'),
+                    14: style.getPropertyValue('--vscode-terminal-ansiBrightCyan'),
+                    15: style.getPropertyValue('--vscode-terminal-ansiBrightWhite')
+                }
+            });
+        }
+    };
+}
+
 window.addEventListener('load', () => {
     
     const vscode = acquireVsCodeApi();
+    const ansiConverterManager = new AnsiConverterManager();
 
     function executeScriptChunk(scriptChunkId, scriptChunkElement) {
         const output = scriptChunkElement.querySelector('.output-inner');
@@ -83,12 +134,14 @@ window.addEventListener('load', () => {
         switch (event.event) {
             case 'stdout':
                 updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
-                    output.insertAdjacentText('beforeend', event.data);
+                    const ansiConverter = ansiConverterManager.getConverter(event.scriptChunkId);
+                    output.insertAdjacentHTML('beforeend', ansiConverter.toHtml(event.data));
                 });
                 break;
             case 'stderr':
                 updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
-                    output.insertAdjacentText('beforeend', event.data);
+                    const ansiConverter = ansiConverterManager.getConverter(event.scriptChunkId);
+                    output.insertAdjacentHTML('beforeend', ansiConverter.toHtml(event.data));
                 });
                 break;
             case 'complete':
@@ -105,9 +158,10 @@ window.addEventListener('load', () => {
                 break;
             case 'log':
                 updateScriptChunk(event.scriptChunkId, (scriptChunk, output) => {
+                    const ansiConverter = ansiConverterManager.getConverter(event.scriptChunkId);
                     scriptChunk.classList.remove('ready', 'running', 'ran');
                     scriptChunk.classList.add('ran');
-                    output.insertAdjacentText('beforeend', event.output);
+                    output.insertAdjacentHTML('beforeend', ansiConverter.toHtml(event.output));
                     setExitCode(scriptChunk, event.exitCode);
                 });
                 break;
