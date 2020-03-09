@@ -33,12 +33,12 @@ export default class MarkdownEngine {
         }) as ExtendedMarkdownIt;
         this.md.use(markdownContainer);
         this.md.use(markdownItScriptChunk());
+        this.md.use(markdownVscResourceLink(config));
     }
 
-    public async render(markdown: string, documentUri: vscode.Uri, config: Config): Promise<ParseResult> {
+    public async render(markdown: string, config: Config): Promise<ParseResult> {
         const tokens = this.md.parse(markdown, {});
         const manager = new ScriptChunkManager(config);
-        this.md.use(markdownVscResourceLink(documentUri));
         const assignedTokens = await manager.assignScriptChunks(tokens);
         const html = this.md.renderer.render(assignedTokens, this.md.options, new MarkdownRenderEnv(manager));
         return new ParseResult(html, manager);

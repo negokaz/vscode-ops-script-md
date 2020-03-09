@@ -16,7 +16,7 @@ export default class OpsViewDocument {
 
     static async render(context: vscode.ExtensionContext, config: Config, eventBus: OpsViewEventBus, document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<OpsViewDocument> {
         const mdEngine = new MarkdownEngine(config);
-        const result = await mdEngine.render(OpsViewDocument.getDocuemntText(document, config), document.uri, config);
+        const result = await mdEngine.render(OpsViewDocument.getDocuemntText(document, config), config);
         let opsViewDocument: OpsViewDocument = new OpsViewDocument(context, eventBus, document, config, panel, result.html, result.scriptChunkManager);
         context.subscriptions.push(opsViewDocument);
         return opsViewDocument;
@@ -60,6 +60,7 @@ export default class OpsViewDocument {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <base href="${this.document.uri.with({ scheme: 'vscode-resource' })}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'icofont.min.css')}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'spinner.css')}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'markdown.css')}">

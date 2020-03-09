@@ -13,6 +13,7 @@ export default class OpsView {
 
     static async open(context: vscode.ExtensionContext, viewColumn: vscode.ViewColumn, document: vscode.TextDocument): Promise<OpsView> {
         const viewId = uuidv4();
+        const config = await Config.load(document.uri);
         const panel = vscode.window.createWebviewPanel(
             'OpsView',
             `OpsView: ${path.basename(document.uri.fsPath)}`,
@@ -20,15 +21,18 @@ export default class OpsView {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
+                localResourceRoots: [config.baseDirectory, vscode.Uri.file(context.extensionPath)]
             }
         );
-        const opsView = new OpsView(context, viewId, panel, document);
+        const opsView = new OpsView(context, config, viewId, panel, document);
         context.subscriptions.push(opsView);
         opsView.render();
         return opsView;
     }
 
     private readonly context: vscode.ExtensionContext;
+
+    private readonly config: Config;
 
     private readonly eventBus: OpsViewEventBus;
 
@@ -40,8 +44,9 @@ export default class OpsView {
 
     private opsViewLog: OpsViewLog | null = null;
 
-    private constructor(context: vscode.ExtensionContext, viewId: string, panel: vscode.WebviewPanel, document: vscode.TextDocument) {
+    private constructor(context: vscode.ExtensionContext, config: Config, viewId: string, panel: vscode.WebviewPanel, document: vscode.TextDocument) {
         this.context = context;
+        this.config = config;
         this.eventBus = OpsViewEventBus.for(viewId);
         this.panel = panel;
         this.document = document;
@@ -70,9 +75,8 @@ export default class OpsView {
 
         this.subscribeEvents();
 
-        const config = await Config.load(this.document.uri);
-        this.opsViewDocument = await OpsViewDocument.render(this.context, config, this.eventBus, this.document, this.panel);
-        this.opsViewLog = await OpsViewLog.active(this.context, config, this.eventBus, this.document, this.opsViewDocument.scriptChunkManager);
+        this.opsViewDocument = await OpsViewDocument.render(this.context, this.config, this.eventBus, this.document, this.panel);
+        this.opsViewLog = await OpsViewLog.active(this.context, this.config, this.eventBus, this.document, this.opsViewDocument.scriptChunkManager);
     }
 
     private subscribeEvents() {
