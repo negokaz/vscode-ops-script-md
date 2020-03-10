@@ -11,14 +11,13 @@ export default function markdownVscResourceLink(config: Config) {
             if (knownSchemes.find(value => link.startsWith(value))) {
                 return originalNormalizeLink(link);
             } else {
-                let resourceUri = vscode.Uri.file(link);
-                if (link.startsWith('/')) {
-                    // absolute path from base directory
-                    resourceUri = vscode.Uri.file(path.join(config.baseDirectory.fsPath, link));
+                let resourceUri: vscode.Uri;
+                if (path.isAbsolute(link)) {
+                    // absolute path
+                    resourceUri = vscode.Uri.file(link);
                 } else {
                     // relative path
-                    const rootPath = path.dirname(config.documentDirectory.fsPath);
-                    resourceUri = vscode.Uri.file(path.join(rootPath, link));
+                    resourceUri = vscode.Uri.file(path.join(config.documentDirectory.fsPath, link));
                 }
                 return originalNormalizeLink(resourceUri.with({ scheme: 'vscode-resource' }).toString(true));
             }

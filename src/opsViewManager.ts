@@ -15,7 +15,7 @@ export default class OpsViewManager {
         this.context = context;
     }
 
-    public openView(viewColumn: vscode.ViewColumn): (uri?: vscode.Uri) => Promise<OpsView> {
+    public openView(viewColumn: vscode.ViewColumn): (uri?: vscode.Uri) => Promise<OpsView | null> {
         return async (uri?: vscode.Uri) => {
             let document: vscode.TextDocument;
             if (uri) {
@@ -27,8 +27,14 @@ export default class OpsViewManager {
                 vscode.window.showErrorMessage(message);
                 throw new Error(message);
             }
-            const key = document.uri.fsPath;
 
+            if (document.languageId !== 'markdown') {
+                // delegate to vscode to open the document if it isn't markdown
+                vscode.commands.executeCommand('vscode.open', document.uri, viewColumn);
+                return null;
+            }
+
+            const key = document.uri.fsPath;
             let opsView: OpsView | undefined = this.views.get(key);
 
             if (opsView) {

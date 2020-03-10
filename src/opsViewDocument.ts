@@ -5,7 +5,7 @@ import Config from './config/config';
 import MarkdownEngine from './markdown/markdownEngine';
 import { StdoutProduced, StderrProduced, ProcessCompleted, SpawnFailed, LogLoaded, ExecutionStarted } from './scriptChunk/processEvents';
 import ScriptChunkManager from './scriptChunk/scriptChunkManager';
-import { TriggeredReload, ChangedDocument } from './opsViewEvents';
+import { TriggeredReload, ChangedDocument, OpenLink } from './opsViewEvents';
 import * as iconv from 'iconv-lite';
 import OpsViewEventBus from './opsViewEventBus';
 import CarriageReturnRemover from './util/carriageReturnRemover';
@@ -97,6 +97,9 @@ export default class OpsViewDocument {
             case 'reloadDocument':
                 this.reloadDocument();
                 return;
+            case 'openLink':
+                this.openLink(message.href);
+                return;
         }
     }
 
@@ -140,6 +143,12 @@ export default class OpsViewDocument {
 
     private reloadDocument() {
         this.eventBus.publish(TriggeredReload.topic, new TriggeredReload());
+    }
+
+    private openLink(href: string) {
+        // all links are converted absolute path while parsing markdown
+        const uri = vscode.Uri.parse(href).with({ scheme: 'file' });
+        vscode.commands.executeCommand('opsScriptMD.openOpsView', uri);
     }
 
     private readonly changeNotificationDelayMs = 300;
