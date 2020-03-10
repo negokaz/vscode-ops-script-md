@@ -151,4 +151,17 @@ window.addEventListener('load', () => {
             tippyInstance.show();
         });
     });
+
+    const passThroughLinkSchemes = ['http:', 'https:', 'mailto:', 'vscode:', 'vscode-insiders:'];
+
+    Array.from(document.querySelectorAll('a'))
+        .filter(node => node.href && !passThroughLinkSchemes.some(scheme => node.href.startsWith(scheme)))
+        .forEach(node => {
+            node.addEventListener('click', event => {
+                vscode.postMessage({ command: 'openLink', href: node.href });
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            });
+        });
 });

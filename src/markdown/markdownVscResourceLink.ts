@@ -1,8 +1,9 @@
 import MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
 import * as path from 'path';
+import Config from '../config/config';
 
-export default function markdownVscResourceLink(documentUri: vscode.Uri) {
+export default function markdownVscResourceLink(config: Config) {
     return (md: MarkdownIt) => {
         const knownSchemes = ['http:', 'https:', 'file:', 'mailto:', 'data:'];
         const originalNormalizeLink = md.normalizeLink;
@@ -10,16 +11,13 @@ export default function markdownVscResourceLink(documentUri: vscode.Uri) {
             if (knownSchemes.find(value => link.startsWith(value))) {
                 return originalNormalizeLink(link);
             } else {
-                let resourceUri = vscode.Uri.file(link);
-                if (link.startsWith('/')) {
-                    // absolute path from workspace
-                    const workspace = vscode.workspace.getWorkspaceFolder(documentUri);
-                    const rootPath = workspace ? workspace.uri.path : path.dirname(documentUri.path);
-                    resourceUri = vscode.Uri.file(path.join(rootPath, link));
+                let resourceUri: vscode.Uri;
+                if (path.isAbsolute(link)) {
+                    // absolute path
+                    resourceUri = vscode.Uri.file(link);
                 } else {
                     // relative path
-                    const rootPath = path.dirname(documentUri.path);
-                    resourceUri = vscode.Uri.file(path.join(rootPath, link));
+                    resourceUri = vscode.Uri.file(path.join(config.documentDirectory.fsPath, link));
                 }
                 return originalNormalizeLink(resourceUri.with({ scheme: 'vscode-resource' }).toString(true));
             }
