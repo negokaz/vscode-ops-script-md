@@ -4,6 +4,7 @@ import * as yaml from 'yaml';
 import { promises as fs, constants as fsConstants } from 'fs';
 import { default as fastGlob } from 'fast-glob';
 
+const barbe = require('barbe');
 const objectAssignDeep = require(`object-assign-deep`);
 
 export default class Config {
@@ -44,9 +45,32 @@ export default class Config {
             if (overwritecConfigDocument) {
                 documents.push(overwritecConfigDocument);
             }
-            return Config.resolve(baseDirectoryPath, documentDirectoryPath, objectAssignDeep(config, overwriteConfig), documents);
+            const configVariables: Object = {
+                BASE_PATH: baseDirectoryPath
+            };
+            const loadedConfig = Config.assignVariables(objectAssignDeep(config, overwriteConfig), configVariables);
+            return Config.resolve(baseDirectoryPath, documentDirectoryPath, loadedConfig, documents);
         }
         return Config.resolve(documentDirectoryPath, documentDirectoryPath, {}, []);
+    }
+
+    private static assignVariables(config: any, variables: Object): any {
+        if (!(typeof config === "object" || config instanceof Array)) {
+            throw new Error(`config must be object or array: ${config}`);
+        }
+
+        function assign(element: string): string {
+            return barbe(element, ["${", "}"], variables);
+        }
+        for (let key in config) {
+            const element = config[key];
+            if (typeof element === "string") {
+                config[key] = assign(element);
+            } else if (typeof element === "object" || element instanceof Array) {
+                this.assignVariables(element, variables);
+            }
+        }
+        return config;
     }
 
     private static findConfigFile(baseDirectoryPath: string): Promise<vscode.Uri | null> {
@@ -62,13 +86,16 @@ export default class Config {
     }
 
     static resolve(baseDirectoryPath: string, documentDirectoryPath: string, config: any, configDocuments: vscode.TextDocument[]): Config {
+        const baseVariables: Object = {
+            BASE_PATH: baseDirectoryPath
+        };
         const env = objectAssignDeep({}, process.env);
         return new Config(
             vscode.Uri.file(baseDirectoryPath),
             vscode.Uri.file(documentDirectoryPath),
             configDocuments,
             config.environment ? objectAssignDeep(env, config.environment) : env,
-            config.variables ? config.variables : {}
+            config.variables ? objectAssignDeep(baseVariables, config.variables) : baseVariables
         );
     }
 
