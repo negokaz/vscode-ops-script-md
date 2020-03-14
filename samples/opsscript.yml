@@ -1,9 +1,0 @@
-variables:
-  hosts:
-    web-server: 127.0.0.1
-  mysql:
-    container_name: mysql
-    root_password: mysql
-environment:
-  LANG: en_US.UTF-8
-  TEST: aaa
