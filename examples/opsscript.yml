@@ -1,0 +1,11 @@
+variables:
+    hosts:
+        my_host: 127.0.0.1
+    message: Hello, world!
+    mysql:
+        container_name: mysql
+        root_password: mysql
+
+environment:
+    LANG: en_US.UTF-8
+    MY_ENV: It works!!!
