@@ -29,7 +29,9 @@
 
 ### 運用作業手順書を書く
 
-手順書のサンプルが [samples](samples) にあります。
+基本的な手順書の書き方は [基本的な使い方](examples/ja/basics.md) を参照してください。
+
+その他の手順書のサンプルは [examples](examples) を参照してください。
 
 ### OpsView を開く
 
