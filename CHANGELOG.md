@@ -6,6 +6,13 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.7.0] - 2020-03-15
+
+### 機能追加
+- スクリプトの出力に ANSI カラーシーケンスが含まれる場合は着色して表示
+- 手順書のリンクをクリックするとリンク先のドキュメントが開かれるよう変更
+- `BASE_PATH` コンテキスト定数を導入（詳細：[reference.md](docs/reference.md)）
+
 ## [0.6.4] - 2020-03-03
 
 ### 機能修正
@@ -100,7 +107,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.6.4...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.7.0
 [0.6.4]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.4
 [0.6.3]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.3
 [0.6.2]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.2
