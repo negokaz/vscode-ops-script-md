@@ -32,13 +32,13 @@ export default class OpsView {
 
     private readonly context: vscode.ExtensionContext;
 
-    private readonly config: Config;
-
     private readonly eventBus: OpsViewEventBus;
 
     private readonly panel: vscode.WebviewPanel;
 
     private readonly document: vscode.TextDocument;
+
+    private config: Config;
 
     private opsViewDocument: OpsViewDocument | null = null;
 
@@ -75,6 +75,7 @@ export default class OpsView {
 
         this.subscribeEvents();
 
+        this.config = await Config.load(this.documentUri());
         this.opsViewDocument = await OpsViewDocument.render(this.context, this.config, this.eventBus, this.document, this.panel);
         this.opsViewLog = await OpsViewLog.active(this.context, this.config, this.eventBus, this.document, this.opsViewDocument.scriptChunkManager);
     }
