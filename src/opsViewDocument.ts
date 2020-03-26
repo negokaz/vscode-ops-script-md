@@ -60,7 +60,6 @@ export default class OpsViewDocument {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <base href="${this.document.uri.with({ scheme: 'vscode-resource' })}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'icofont.min.css')}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'spinner.css')}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'markdown.css')}">
@@ -68,6 +67,12 @@ export default class OpsViewDocument {
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'ops-view.css')}">
         <link rel="stylesheet" href="${this.resourceUri('media', 'css', 'highlight.css')}">
         <script src="${this.resourceUri('dist', 'opsView.js')}"></script>
+
+        <!--
+            This base tag must be placed at the bottom of the head tag. 
+            Otherwise, it can fail to load the linked file in the head tag.
+        -->
+        <base href="${this.document.uri.with({ scheme: 'vscode-resource' })}">
     </head>
     <body>
         <div class="reload-notification hover">
