@@ -2,7 +2,7 @@
 	"name": "opsscriptmd",
 	"displayName": "OpsScriptMD",
 	"description": "A documentation tool for semi-automatic operations",
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"publisher": "negokaz",
 	"engines": {
 		"vscode": "^1.32.0"

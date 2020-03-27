@@ -6,6 +6,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 ## [リリース予定]
 
+## [0.7.1] - 2020-03-27
+
 ### 機能修正
 - 構成定義を更新した際にリロードしても変更が反映されない問題を修正
 - 拡張がインストールされたのと異なるドライブに配置されたドキュメントを開いた際、実行に必要なファイルがロードできない問題を修正
@@ -111,7 +113,8 @@ OpsScriptMD の注目すべき変更はこのファイルで文書化されま�
 
 - 初回リリース🚀
 
-[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.7.0...HEAD
+[リリース予定]: https://github.com/negokaz/vscode-ops-script-md/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.7.1
 [0.7.0]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.7.0
 [0.6.4]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.4
 [0.6.3]: https://github.com/negokaz/vscode-ops-script-md/releases/tag/v0.6.3
