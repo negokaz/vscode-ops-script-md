@@ -111,7 +111,11 @@ export default class OpsView {
         });
         this.eventBus.subscribe(ChangedDocument.topic, (event: ChangedDocument) => {
             if (this.opsViewDocument) {
-                this.opsViewDocument.postMessage({ event: 'changedDocument' });
+                setTimeout(() => {
+                    if (!this.opsViewDocument?.scriptChunkManager.hasRunningScript()) {
+                        this.render();
+                    }
+                }, 1000);
             }
         });
     }

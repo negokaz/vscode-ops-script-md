@@ -71,6 +71,10 @@ export default class ScriptChunk {
         return undefined;
     }
 
+    public get isRunning(): boolean {
+        return this.process !== undefined;
+    }
+
     public get commandLine(): string {
         const header = this.stdin ? '[stdin] ' : '';
         function quoteIfContainsSpace(str: string): string {
